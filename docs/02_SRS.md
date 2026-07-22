@@ -597,60 +597,244 @@ NFR-23 The backend shall support future mobile applications without major archit
 
 ---
 
+FR-XX Role Management
+
+The system shall support role-based authorization.
+
+Roles:
+
+- User
+- Administrator
+
+Standard users shall only access their own data.
+
+Administrators shall have elevated permissions for future management features.
+
 # 6. Use Cases
 
-### UC-1 Create Profile
-Actor: User
+---
 
-Flow:
-1. Open profile page
-2. Enter details
-3. Save
-4. Goals calculated
+## UC-01 Register Account
 
-### UC-2 Log Meal
-1. Enter meal text
-2. Backend calls AI
-3. AI extracts foods
-4. Nutrition calculated
-5. Dashboard updated
+### Primary Actor
+Guest User
 
-### UC-3 Export Report
-1. Open reports
-2. Select PDF
-3. Download report
+### Preconditions
+- User is not registered.
+
+### Main Flow
+1. User opens the registration page.
+2. User enters required information.
+3. System validates the input.
+4. User account is created.
+5. User is redirected to profile setup.
+
+### Postconditions
+- User account is successfully created.
 
 ---
+
+## UC-02 Login
+
+### Primary Actor
+Registered User
+
+### Preconditions
+- User account exists.
+
+### Main Flow
+1. User enters email and password.
+2. System validates credentials.
+3. User is authenticated.
+4. Dashboard is displayed.
+
+### Postconditions
+- User session is started.
+
+---
+
+## UC-03 Create Profile
+
+### Primary Actor
+Registered User
+
+### Preconditions
+- User is logged in.
+
+### Main Flow
+1. User enters:
+   - Age
+   - Height
+   - Weight
+   - Gender
+   - Activity Level
+   - Goal
+2. System validates input.
+3. System calculates nutrition goals.
+4. Profile is saved.
+
+### Postconditions
+- User profile exists.
+
+---
+
+## UC-04 Log Meal
+
+### Primary Actor
+Registered User
+
+### Preconditions
+- User profile exists.
+
+### Main Flow
+1. User selects meal type.
+2. User enters meal description.
+3. Backend sends text to AI.
+4. AI extracts food items.
+5. Backend searches local nutrition database.
+6. Nutrition totals are calculated.
+7. Meal is saved.
+8. Dashboard updates automatically.
+
+### Postconditions
+- Meal is successfully stored.
+
+---
+
+## UC-05 Track Water
+
+### Primary Actor
+Registered User
+
+### Main Flow
+1. User adds water intake.
+2. System updates total intake.
+3. Dashboard refreshes.
+
+### Postconditions
+- Water intake is saved.
+
+---
+
+## UC-06 View Dashboard
+
+### Primary Actor
+Registered User
+
+### Main Flow
+1. User opens dashboard.
+2. System loads today's meals.
+3. System calculates totals.
+4. Progress bars are displayed.
+
+### Postconditions
+- Dashboard is displayed.
+
+---
+
+## UC-07 View Meal History
+
+### Primary Actor
+Registered User
+
+### Main Flow
+1. User opens meal history.
+2. User selects a date.
+3. System displays meals.
+4. User may edit or delete meals.
+
+### Postconditions
+- Meal history is displayed.
+
+---
+
+## UC-08 Export Report
+
+### Primary Actor
+Registered User
+
+### Main Flow
+1. User opens reports.
+2. User selects PDF export.
+3. System generates report.
+4. PDF is downloaded.
+
+### Postconditions
+- Report exported successfully.
+
+---
+
+## UC-09 Manage Custom Foods
+
+### Primary Actor
+Registered User
+
+### Main Flow
+1. User creates a custom food or recipe.
+2. User enters nutrition information.
+3. System validates and saves it.
+4. Custom food becomes available for future meal logging.
+
+### Postconditions
+- Custom food is saved.
 
 # 7. User Stories
 
-- As a user, I want to log meals naturally.
-- As a user, I want nutrition goals.
-- As a user, I want daily progress.
-- As a user, I want PDF reports.
-- As a user, I want to delete my account.
+US-01 As a new user, I want to create an account so that I can save my nutrition data.
 
----
+US-02 As a user, I want to create my health profile so that I receive personalized nutrition goals.
+
+US-03 As a user, I want to log meals using natural language so that I don't need to manually search for foods.
+
+US-04 As a user, I want AI to identify foods from my meal description automatically.
+
+US-05 As a user, I want to view my daily nutrition progress.
+
+US-06 As a user, I want to track my daily water intake.
+
+US-07 As a user, I want to edit previously logged meals.
+
+US-08 As a user, I want to view my meal history.
+
+US-09 As a user, I want to create custom foods and recipes.
+
+US-10 As a user, I want to export my nutrition reports as PDF.
+
+US-11 As a user, I want to delete my account and all associated data.
 
 # 8. Acceptance Criteria
 
-- Profile creation works.
-- Meal analysis returns nutrition.
-- Dashboard updates.
-- Water tracking functions.
-- PDF export works.
+The MVP shall be considered complete when:
 
----
-
+- Users can register and log in.
+- Users can create and update profiles.
+- Personalized nutrition goals are generated.
+- Users can log meals using natural language.
+- AI successfully extracts food items.
+- Nutrition is calculated using the local database.
+- Dashboard displays daily nutrition progress.
+- Water tracking works correctly.
+- Meal history is available.
+- Custom foods and recipes can be created.
+- PDF reports can be generated.
+- Users can delete their accounts.
+  
 # 9. Future Enhancements
 
-- Food image recognition
-- Barcode scanner
-- Voice input
-- AI nutrition coach
-- Grocery recommendations
-- Mobile applications
-- Exercise tracking
+The following features are planned for future releases:
 
----
-End of SRS
+- Mobile applications (Android and iOS)
+- Google Sign-In
+- Barcode scanning
+- Food image recognition
+- Voice-based meal logging
+- AI nutrition coach
+- Meal recommendations
+- Weekly meal planning
+- Grocery list generation
+- Smart reminders
+- Fitness tracker integration
+- Wearable device integration
+- Community challenges
+- Multi-language support
+- Admin dashboard
