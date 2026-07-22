@@ -1,26 +1,26 @@
-# NutriTrack - Project Handoff Summary (Updated)
+# NutriTrack - Project Handoff Summary (Latest)
 
 ## Project Status
 
-**Current Phase:** API Design Documentation
+**Current Phase:** Documentation Completed → Ready for Development
 
-**Completion Status**
+### Completion Status
 
-| Phase                                     | Status |
-| ----------------------------------------- | ------ |
-| Repository Setup                          | ✅      |
-| Project Charter                           | ✅      |
-| Software Requirements Specification (SRS) | ✅      |
-| Software Design Document (SDD)            | ✅      |
-| Database Design Document (DDD)            | ✅      |
-| API Design Document                       | ⏳ Next |
-| UI/UX Design                              | ⏳      |
-| AI Integration Design                     | ⏳      |
-| Testing Strategy                          | ⏳      |
-| Deployment Guide                          | ⏳      |
-| Development                               | ❌      |
+| Phase                                     | Status            |
+| ----------------------------------------- | ----------------- |
+| Repository Setup                          | ✅                 |
+| Project Charter                           | ✅                 |
+| Software Requirements Specification (SRS) | ✅                 |
+| Software Design Document (SDD)            | ✅                 |
+| Database Design Document (DDD)            | ✅                 |
+| API Design Document                       | ✅                 |
+| UI/UX Design Document                     | ✅                 |
+| AI Integration Design                     | ⏳ Planned         |
+| Testing Strategy                          | ⏳ Planned         |
+| Deployment Guide                          | ⏳ Planned         |
+| Development                               | 🚀 Ready to Start |
 
-No application code has been written yet.
+**No application code has been written yet.**
 
 ---
 
@@ -28,7 +28,7 @@ No application code has been written yet.
 
 NutriTrack is an AI-powered nutrition tracking application that enables users to log meals using natural language instead of manually searching food databases.
 
-The AI is **not responsible for nutrition calculations**.
+The AI **does not calculate nutrition**.
 
 Its only responsibility is converting natural language into structured food items.
 
@@ -36,7 +36,9 @@ Example:
 
 Input
 
-"I ate 2 eggs and one banana."
+```
+I ate 2 eggs and one banana.
+```
 
 Output
 
@@ -57,7 +59,7 @@ Output
 }
 ```
 
-All nutrition calculations are performed by the backend using a local PostgreSQL nutrition database.
+The backend's Nutrition Engine performs all nutrition calculations using a local PostgreSQL nutrition database.
 
 ---
 
@@ -65,393 +67,264 @@ All nutrition calculations are performed by the backend using a local PostgreSQL
 
 Develop a portfolio-quality Web and Desktop nutrition tracking application that allows users to:
 
-- Register/Login
-- Create a health profile
-- Calculate personalized nutrition goals
-- Log meals using natural language
-- Automatically calculate nutrition
-- Track water intake
-- View dashboards
-- View meal history
-- Create custom foods
-- Create recipes
-- Export PDF reports
+* Register & Login
+* Create a health profile
+* Calculate personalized nutrition goals
+* Log meals using natural language
+* Automatically calculate nutrition
+* Track water intake
+* View dashboards
+* View meal history
+* Create recipes
+* Create custom foods
+* Export PDF reports
 
 ---
 
-# Tech Stack
+# Technology Stack
 
 ## Frontend
 
-- React
-- TypeScript
-- Tailwind CSS
-- React Router
-- Axios
-- Recharts
+* React
+* TypeScript
+* Tailwind CSS
+* React Router
+* Axios
+* Recharts
+* shadcn/ui
+* Lucide React
 
 ## Desktop
 
-- Electron
+* Electron
 
 ## Backend
 
-- FastAPI
-- Python
+* FastAPI
+* Python
 
 ## Database
 
-- PostgreSQL
+* PostgreSQL
 
 ## ORM
 
-- SQLAlchemy
+* SQLAlchemy
 
 ## AI
 
-- OpenAI Compatible API
+* OpenAI-Compatible API
 
 ## Authentication
 
-- JWT
-- Google OAuth (Future)
+* JWT Authentication
+* Google OAuth (Version 2)
 
 ---
 
-# Documentation Structure
+# Documentation Status
 
 ```
 docs/
 │
-├── 01_Project_Charter.md             ✅
-├── 02_SRS.md                         ✅
-├── 03_SDD.md                         ✅
-├── 04_Database_Design.md             ✅
-├── 05_API_Design.md                  ⏳
-├── 06_UI_UX_Design.md                ⏳
-├── 07_AI_Integration.md              ⏳
-├── 08_Testing_Strategy.md            ⏳
-├── 09_Deployment.md                  ⏳
-├── 10_Project_Roadmap.md             ⏳
-├── 11_Architecture_Decisions.md      ⏳
+├── ✅ 01_Project_Charter.md
+├── ✅ 02_SRS.md
+├── ✅ 03_SDD.md
+├── ✅ 04_Database_Design.md
+├── ✅ 05_API_Design.md
+├── ✅ 06_UI_UX_Design.md
+├── ⏳ 07_AI_Integration.md
+├── ⏳ 08_Testing_Strategy.md
+├── ⏳ 09_Deployment.md
+├── ⏳ 10_Project_Roadmap.md
+├── ⏳ 11_Architecture_Decisions.md
 └── diagrams/
 ```
 
 ---
 
-# Completed Documents
+# Completed Documentation
 
-## 01_Project_Charter.md
+## ✅ Project Charter
 
-Completed.
-
-Contains:
-
-- Vision
-- Mission
-- Scope
-- Objectives
-- Stakeholders
-- Risks
-- Success Criteria
+* Vision
+* Mission
+* Scope
+* Objectives
+* Stakeholders
+* Risks
+* Success Criteria
 
 ---
 
-## 02_SRS.md
+## ✅ Software Requirements Specification (SRS)
 
-Completed.
-
-Contains:
-
-- Functional Requirements
-- Non-functional Requirements
-- Use Cases
-- User Stories
-- Acceptance Criteria
-- Future Enhancements
+* Functional Requirements
+* Non-functional Requirements
+* User Stories
+* Use Cases
+* Acceptance Criteria
+* Future Enhancements
 
 ---
 
-## 03_SDD.md
+## ✅ Software Design Document (SDD)
 
-Completed.
+Includes:
 
-Contains:
+* High-Level Architecture
+* Layered Architecture
+* Component Design
+* Module Design
+* Database Architecture
+* Class Design
+* Sequence Diagrams
+* Deployment Diagram
+* Security Design
+* Error Handling
+* Design Patterns
+* Technology Justification
 
-1. Introduction
-2. Design Goals
-3. System Architecture
-4. Component Design
-5. Module Design
-6. Database Design Overview
-7. Class Design
-8. Sequence Diagrams
-9. Deployment Architecture
-10. Security Design
-11. Error Handling
-12. Design Patterns
-13. Technology Justification
-14. System Diagrams
+---
 
-## 04_Database_Design.md
+## ✅ Database Design
 
-Completed.
+Includes:
 
-Contains:
+* ER Design
+* Database Philosophy
+* Naming Conventions
+* Table Specifications
+* Relationships
+* Constraints
+* Indexes
+* Data Dictionary
+* Migration Strategy
+* Future Expansion
 
-- Database Philosophy
-- Naming Conventions
-- Design Principles
-- Table Specifications
-- Relationships
-- Constraints
-- Indexing Strategy
-- Normalization
-- Data Integrity Rules
-- Data Dictionary
-- Migration Strategy
-- Future Expansion
+---
+
+## ✅ API Design
+
+Includes approximately **40 REST endpoints** across:
+
+* Authentication
+* Users
+* Profiles
+* Meals
+* Dashboard
+* Water
+* Recipes
+* Custom Foods
+* Reports
+
+Also includes:
+
+* Request/Response Standards
+* Validation Rules
+* Error Codes
+* Pagination
+* Filtering
+* Rate Limiting
+* Versioning
+* Security
+* OpenAPI Documentation
+
+---
+
+## ✅ UI/UX Design
+
+Includes:
+
+* Design Philosophy
+* Design System
+* Color Palette
+* Typography
+* Navigation
+* Information Architecture
+* User Flows
+* Screen Specifications
+* Wireframes
+* Responsive Design
+* Accessibility
+* Components
+* Loading States
+* Empty States
+* Error States
+* Theme Support
+* Future UI Enhancements
 
 ---
 
 # Architecture Decisions (Locked)
 
-## ADR-001
+## AI
 
-AI extracts food only.
+* AI extracts structured food only.
+* AI never calculates nutrition.
 
-Backend calculates nutrition.
+## Nutrition
 
-✅ Approved
+* Local PostgreSQL nutrition database.
+* Dedicated Nutrition Engine owns all nutrition calculations.
 
----
+## Architecture
 
-## ADR-002
+* Layered Architecture
+* Feature-Based Modular Architecture
+* Repository Pattern
+* Service Layer Pattern
+* Dependency Injection
+* DTO Pattern (Pydantic)
+* Singleton Pattern
+* Factory Pattern (Future AI Providers)
 
-Use local PostgreSQL nutrition database.
+## Authentication
 
-No nutrition API.
+* Email & Password (Version 1)
+* Google OAuth (Version 2)
 
-✅ Approved
+## Meals
 
----
+* Meal Types:
 
-## ADR-003
+  * Breakfast
+  * Lunch
+  * Dinner
+  * Snack
 
-Meal types:
+* Meal totals stored in the Meal table.
 
-- Breakfast
-- Lunch
-- Dinner
-- Snack
+* Nutrition Engine keeps totals synchronized.
 
-✅ Approved
+* Meal history supports viewing, editing, deleting, and filtering.
 
----
+## User Management
 
-## ADR-004
-
-Meal History
-
-Users can:
-
-- View
-- Edit
-- Delete
-- Filter
-
-✅ Approved
-
----
-
-## ADR-005
-
-Micronutrients
-
-Rejected for Version 1.
-
-Only:
-
-- Calories
-- Protein
-- Carbs
-- Fat
-- Fiber
-- Sugar
-- Water
-
-❌ Rejected
-
----
-
-## ADR-006
-
-Authentication
-
-Architecture supports:
-
-- Email & Password
-- Google OAuth
-
-Implementation:
-
-V1:
-
-Email
-
-V2:
-
-Google OAuth
-
-✅ Approved
-
----
-
-## ADR-007
-
-Custom Foods
-
-Users can create:
-
-- Custom Foods
-- Recipes
-
-✅ Approved
-
----
-
-## ADR-008
-
-Meal Time
-
-Manual meal time not required.
-
-Meal Date only.
-
-❌ Rejected
-
----
-
-## ADR-009
-
-Architecture Style
-
-Layered Architecture.
-
-✅ Approved
-
----
-
-## ADR-010
-
-Project Organization
-
-Feature-Based Modular Architecture.
-
-Each module contains:
-
-- router.py
-- service.py
-- repository.py
-- models.py
-- schemas.py
-
-✅ Approved
-
----
-
-## ADR-011
-
-Nutrition Engine
-
-Introduce a dedicated Nutrition Engine responsible for:
-
-- Food lookup
-- Nutrition calculations
-- Aggregation
-- Meal totals
-
-No other module performs nutrition calculations.
-
-✅ Approved
-
----
-
-## ADR-012
-
-User Separation
-
-Authentication data and profile data are stored separately.
+Authentication data is stored separately from health profile data.
 
 Tables:
 
-- User
-- UserProfile
+* User
+* UserProfile
 
-✅ Approved
+## Custom Features
 
----
+Version 1 supports:
 
-## ADR-013
+* Recipes
+* Custom Foods
 
-Meal Totals
+## RBAC
 
-Store calculated totals inside the Meal table.
+Roles:
 
-Nutrition Engine keeps them synchronized.
-
-This is intentional denormalization for better performance.
-
-✅ Approved
+* user
+* admin (reserved for future use)
 
 ---
 
-AI Metadata
-
-Meal stores:
-
-- ai_provider
-- ai_model
-- ai_status
-- processing_time_ms
-- confidence_score
-
-Purpose:
-
-Support debugging, analytics and future AI provider comparisons.
-
-✅ Approved
-
-Meal Audit Information
-
-Meal stores:
-
-- source
-- is_edited
-- edited_at
-
-Purpose:
-
-Track meal origin and edit history.
-
-✅ Approved
-
-Role-Based Access Control (RBAC)
-
-User table includes:
-
-role
-
-Supported roles:
-
-- user
-- admin
-
-Version 1 primarily uses the user role while reserving the admin role for future administrative capabilities.
-
-✅ Approved
-
-# Final Architecture
+# Final System Architecture
 
 ```
 React / Electron
@@ -462,26 +335,25 @@ FastAPI Router
         ▼
 Service Layer
         │
-        ├─────────────┐
-        ▼             ▼
+        ├───────────────┐
+        ▼               ▼
 AI Service     Nutrition Engine
-        │             │
-        ▼             ▼
- OpenAI API    Repository Layer
-                     │
-                     ▼
+        │               │
+        ▼               ▼
+OpenAI API   Repository Layer
+                    │
+                    ▼
                PostgreSQL
 ```
 
 ---
 
-# Backend Architecture
+# Backend Structure
 
 ```
 backend/
 │
 └── app/
-    │
     ├── core/
     ├── auth/
     ├── users/
@@ -490,145 +362,135 @@ backend/
     ├── nutrition/
     ├── dashboard/
     ├── water/
-    ├── reports/
     ├── recipes/
     ├── custom_foods/
+    ├── reports/
     ├── ai/
     ├── database/
     ├── utils/
     └── main.py
 ```
 
-Each feature contains:
+Every feature follows:
 
-- router.py
-- service.py
-- repository.py
-- models.py
-- schemas.py
-
----
-
-# Core Database Entities
-
-User
-
-- id
-- email
-- password_hash
-- auth_provider
-- role
-- is_active
-- created_at
-- updated_at
-
----
-
-# Design Patterns
-
-Implemented:
-
-- Layered Architecture
-- Repository Pattern
-- Service Layer Pattern
-- Dependency Injection
-- DTO (Pydantic)
-- Singleton
-- Factory Pattern (Future AI Providers)
+* router.py
+* service.py
+* repository.py
+* models.py
+* schemas.py
 
 ---
 
 # Development Philosophy
 
-Documentation First.
+Documentation First
 
-Workflow
+Workflow:
 
+```
 Project Charter
-
-↓
-
+        ↓
 SRS
-
-↓
-
+        ↓
 SDD
-
-↓
-
+        ↓
 Database Design
-
-↓
-
+        ↓
 API Design
-
-↓
-
+        ↓
 UI/UX Design
-
-↓
-
-AI Integration
-
-↓
-
+        ↓
 Development
+        ↓
+Testing
+        ↓
+Deployment
+```
 
 Every implementation must follow the approved documentation.
 
 ---
 
-| Document          | Status |
-| ----------------- | ------ |
-| GitHub Repository | ✅      |
-| Project Charter   | ✅      |
-| SRS               | ✅      |
-| SDD               | ✅      |
-| Database Design   | ✅      |
-| API Design        | ⏳      |
-| UI/UX Design      | ⏳      |
-| AI Integration    | ⏳      |
-| Testing Strategy  | ⏳      |
-| Deployment        | ⏳      |
-| Development       | ❌      |
+# Current Progress
 
+| Item              | Status          |
+| ----------------- | --------------- |
+| GitHub Repository | ✅               |
+| Project Structure | ✅               |
+| Documentation     | ✅ Core Complete |
+| Backend           | ❌ Not Started   |
+| Frontend          | ❌ Not Started   |
+| Database          | ❌ Not Started   |
+| AI Integration    | ❌ Not Started   |
+| Testing           | ❌ Not Started   |
+| Deployment        | ❌ Not Started   |
 
 ---
 
-# Immediate Next Step
+# Next Steps
 
-Create:
+## Phase 1 – Project Initialization
 
-docs/05_API_Design.md
+* Initialize FastAPI backend
+* Initialize React + Vite frontend
+* Configure Tailwind CSS
+* Install shadcn/ui
+* Configure PostgreSQL
+* Configure SQLAlchemy
+* Configure Alembic
+* Configure environment variables
 
-This document will define:
+## Phase 2 – Backend Development
 
-- REST API Endpoints
-- Authentication APIs
-- User APIs
-- Profile APIs
-- Meal APIs
-- Dashboard APIs
-- Water APIs
-- Recipe APIs
-- Custom Food APIs
-- Request Models
-- Response Models
-- Validation Rules
-- HTTP Status Codes
-- Error Responses
-- API Versioning
+* Authentication
+* Database Models
+* Nutrition Engine
+* AI Integration
+* REST APIs
 
-The API Design document will act as the contract between the frontend and backend, ensuring both sides are developed consistently.
+## Phase 3 – Frontend Development
 
-- Documentation is the single source of truth.
-- AI is responsible only for natural language understanding.
-- The Nutrition Engine owns all nutrition calculations.
-- Services own business logic.
-- Repositories own database access.
-- Routers contain no business logic.
-- Frontend communicates only through REST APIs.
-- SQLAlchemy is the source of the database schema.
-- Alembic manages all database migrations.
-- PostgreSQL is the authoritative data store.
-- Architecture decisions are locked unless formally revised.
+* Authentication
+* Dashboard
+* Meals
+* Water Tracking
+* Recipes
+* Custom Foods
+* Profile
+* Settings
+
+## Phase 4 – Testing
+
+* Unit Tests
+* Integration Tests
+* API Tests
+* UI Tests
+
+## Phase 5 – Deployment
+
+* Backend
+* Database
+* Frontend
+* Desktop Application
+
+---
+
+# Guiding Principles
+
+* Documentation is the single source of truth.
+* AI is responsible only for natural language understanding.
+* Nutrition calculations are performed exclusively by the Nutrition Engine.
+* Services own business logic.
+* Repositories own database access.
+* Routers remain thin and contain no business logic.
+* The frontend communicates only through REST APIs.
+* SQLAlchemy defines the database schema.
+* Alembic manages all database migrations.
+* PostgreSQL is the authoritative data store.
+* Architecture decisions are considered locked unless formally revised.
+
+---
+
+## Current Milestone
+
+**The project planning phase is complete. NutriTrack is now ready for implementation.**
