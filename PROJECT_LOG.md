@@ -163,3 +163,30 @@ Recommended order:
 12. Integrate AI service
 13. Testing
 14. Deployment
+
+## 2026-07-25
+
+### Architecture Decision
+
+Switched from fully custom authentication to a hybrid architecture.
+
+Decision:
+
+- Supabase Authentication
+- Supabase PostgreSQL
+- FastAPI for all business logic
+- AI handled through OpenAI-compatible APIs
+
+Reason:
+
+Authentication is solved infrastructure. Engineering effort should focus on NutriTrack's differentiating features:
+
+- AI meal parsing
+- Nutrition Engine
+- Analytics
+- Reports
+- Business logic
+
+Status:
+
+✅ Approved

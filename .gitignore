@@ -150,3 +150,23 @@ credentials.json
 
 # Except documentation PDFs
 !docs/**/*.pdf
+docs/NutriTrack/docs/01_Project_Charter.md
+docs/NutriTrack/docs/01_Project_Charter.md
+docs/NutriTrack/docs/02_SRS.md
+docs/NutriTrack/docs/03_SDD.md
+docs/NutriTrack/docs/04_Database_Design.md
+docs/NutriTrack/docs/05_API_Design.md
+docs/NutriTrack/docs/06_UI_UX.md
+docs/NutriTrack/docs/07_Testing.md
+docs/NutriTrack/docs/08_Deployment.md
+docs/NutriTrack/docs/09_Roadmap.md
+docs/NutriTrack/docs/01_Project_Charter.md
+docs/NutriTrack/docs/02_SRS.md
+docs/NutriTrack/docs/03_SDD.md
+docs/NutriTrack/docs/04_Database_Design.md
+docs/NutriTrack/docs/05_API_Design.md
+docs/NutriTrack/docs/06_UI_UX.md
+docs/NutriTrack/docs/07_Testing.md
+docs/NutriTrack/docs/08_Deployment.md
+docs/NutriTrack/docs/09_Roadmap.md
+docs/NutriTrack/docs/01_Project_Charter.md

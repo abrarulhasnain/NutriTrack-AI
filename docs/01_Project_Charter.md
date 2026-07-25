@@ -120,6 +120,8 @@ The project will be considered successful if:
 | Charts | Recharts |
 | Version Control | Git + GitHub |
 | Deployment | Docker |
+| Auth & Database Hosting | Supabase |
+
 
 ---
 

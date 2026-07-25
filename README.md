@@ -34,3 +34,13 @@ Desktop:
 Documentation:
 - IEEE SRS
 - IEEE SDD
+
+## Architecture
+
+NutriTrack follows a hybrid architecture.
+
+- Supabase provides Authentication and managed PostgreSQL.
+- FastAPI implements all business logic, AI integration, and nutrition calculations.
+- React and Electron provide the user interface.
+
+This allows the project to focus on its core value while using production-grade authentication infrastructure.

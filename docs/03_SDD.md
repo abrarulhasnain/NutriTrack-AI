@@ -44,6 +44,7 @@ This document is intended for:
 - React Documentation
 - PostgreSQL Documentation
 - OpenAI API Documentation
+- Supabase Documentation
 
 # 2. Design Goals
 
@@ -72,13 +73,15 @@ User
 ↓
 Frontend (React / Electron)
 ↓
-REST API (FastAPI)
+Supabase Auth (authentication & JWT issuance)
+↓
+REST API (FastAPI) ← validates JWT on every protected request
 ↓
 Service Layer
 ↓
 Repository Layer
 ↓
-PostgreSQL Database
+PostgreSQL Database (hosted via Supabase)
 
 The AI Service is accessed by the Service Layer to extract structured food information from natural language meal descriptions.
 
@@ -131,11 +134,7 @@ backend/
 │   ├── core/                 # Config, security, constants
 │   │
 │   ├── auth/
-│   │   ├── router.py
-│   │   ├── service.py
-│   │   ├── repository.py
-│   │   ├── models.py
-│   │   └── schemas.py
+│   │      └── dependencies.py    # JWT validation dependency (Supabase token verification)
 │   │
 │   ├── users/
 │   │
@@ -190,21 +189,22 @@ User
     ▼
 React Frontend
     │
-    ▼
-FastAPI Router
-    │
-    ▼
-Service Layer
-    │
-    ├──────────────┐
-    ▼              ▼
-AI Service   Nutrition Engine
-    │              │
-    ▼              ▼
-OpenAI API   PostgreSQL Database
-       │
-       └──────────────► Repository Layer
-
+    ├──────────────────────────────────┐
+    ▼                                  ▼
+Supabase Auth                  FastAPI Router (JWT validated)
+(register / login / token)             │
+                                       ▼
+                               Service Layer
+                                       │
+                           ┌───────────┘
+                           ▼              ▼
+                       AI Service   Nutrition Engine
+                           │              │
+                           ▼              ▼
+                       OpenAI API   Repository Layer
+                                         │
+                                         ▼
+                                  PostgreSQL (Supabase)
 
 # 4. Component Design
 
@@ -269,7 +269,7 @@ Acts as the central controller of the application.
 ## Responsibilities
 
 - Receive HTTP requests
-- Authenticate users
+- Validate Supabase JWT on protected requests
 - Validate requests
 - Execute business logic
 - Communicate with AI
@@ -290,6 +290,35 @@ Acts as the central controller of the application.
 ---
 
 # 4.4 Authentication Component
+# 4.4 Authentication Component
+
+## Purpose
+
+Validate user identity on every protected API request.
+
+## Implementation
+
+Authentication is handled by Supabase Auth.
+
+Supabase is responsible for:
+- User registration
+- Login
+- Logout
+- Email verification
+- Password reset
+- Session management
+- Google OAuth (Version 2)
+
+FastAPI receives a Supabase-issued JWT access token from the client on every protected request and validates it before executing business logic. FastAPI does not implement registration, login, or password management.
+
+## Inputs
+
+- Supabase JWT access token (from Authorization header)
+
+## Outputs
+
+- Authenticated user identity (supabase_user_id extracted from token)
+- 401 Unauthorized if token is missing or invalid
 
 ## Purpose
 
@@ -520,7 +549,7 @@ backend/
 │   │
 │   ├── core/
 │   │
-│   ├── auth/
+│   ├── ├── auth/                 
 │   ├── users/
 │   ├── profiles/
 │   ├── meals/
@@ -643,17 +672,22 @@ Contents
 
 # 5.5 Authentication Module
 
-Responsibilities
+Authentication is managed by Supabase Authentication.
 
-- Register users
-- Login users
-- Verify JWT tokens
-- Password hashing
-- Authentication middleware
+Responsibilities of Supabase:
 
-Dependencies
+- User Registration
+- User Login
+- Email Verification
+- Password Reset
+- Session Management
+- Future Google OAuth
 
-- User Module
+FastAPI does not authenticate users directly.
+
+Instead, every protected request includes a Supabase-issued JWT access token.
+
+FastAPI validates the token before executing business logic.
 
 ---
 
@@ -892,21 +926,21 @@ Food
 
 Purpose
 
-Stores authentication information.
+Stores application-level user data and links to the Supabase Auth identity.
 
 Columns
 
 - id (UUID, Primary Key)
-- email
-- password_hash
-- auth_provider
+- supabase_user_id (UUID, Unique — references the Supabase Auth user)
+- email (for display and lookup only; authoritative copy lives in Supabase Auth)
+- role (user / admin)
 - is_active
 - created_at
 - updated_at
 
 Notes
 
-This table stores authentication data only.
+Authentication credentials (password hash, session tokens) are managed exclusively by Supabase Auth and are never stored in this table. This table exists to link application data (meals, profiles, water logs, etc.) to the authenticated identity.
 
 ---
 
@@ -1196,25 +1230,21 @@ NutriTrack follows an object-oriented design. Classes are grouped by feature and
 
 ### User
 
-**Purpose**
-
-Represents an authenticated user.
-
 **Attributes**
 
 - id
+- supabase_user_id
 - email
-- password_hash
-- auth_provider
+- role
 - is_active
 - created_at
 - updated_at
 
 **Responsibilities**
 
-- Authentication
-- Account lifecycle
-- User ownership
+- Link application data to the Supabase Auth identity
+- Account lifecycle (deletion, status)
+- User ownership enforcement
 
 ---
 
@@ -1367,15 +1397,15 @@ Represents a water intake entry.
 
 ## 7.3 Service Classes
 
-### AuthenticationService
+### AuthenticationService (JWT Validation Only)
 
 Responsibilities
 
-- Register user
-- Login
-- Verify JWT
-- Hash passwords
+- Extract and validate Supabase JWT from the Authorization header
+- Parse supabase_user_id from the validated token
+- Reject requests with missing or invalid tokens (401)
 
+Note: Registration, login, and password management are handled by Supabase Auth, not by this service.
 ---
 
 ### UserService
@@ -1522,21 +1552,23 @@ Dashboard Updated
 
 ## 8.2 User Login Flow
 
+## 8.2 User Login Flow
+
 User
     ↓
 Frontend
     ↓
-Authentication Router
+Supabase Auth (email + password submitted directly)
     ↓
-Authentication Service
+JWT Access Token issued by Supabase
     ↓
-User Repository
+Frontend stores token
     ↓
-PostgreSQL
+All subsequent API requests include: Authorization: Bearer <JWT>
     ↓
-JWT Generated
+FastAPI validates JWT (no database call required)
     ↓
-Frontend
+supabase_user_id extracted → business logic executes
 
 ---
 
@@ -1561,6 +1593,11 @@ Dashboard Response
 Frontend
 
 # 9. Deployment Architecture
+## External Services
+
+- OpenAI-compatible API
+- Supabase (Authentication + PostgreSQL hosting)
+
 
 ## Development Environment
 
@@ -1585,13 +1622,14 @@ External Service
 
 OpenAI-compatible API
 
+
 ## Environment Variables
 
 - DATABASE_URL
 - OPENAI_API_KEY
-- JWT_SECRET
-- JWT_ALGORITHM
-- ACCESS_TOKEN_EXPIRE_MINUTES
+- SUPABASE_URL
+- SUPABASE_SERVICE_ROLE_KEY     # Used by FastAPI to verify JWTs server-side
+- SUPABASE_JWT_SECRET           # Supabase project JWT secret for token validation
 
 ## Deployment Goals
 
@@ -1612,9 +1650,9 @@ Version 1 supports:
 - admin
 
 Role checks are performed at the service layer before executing privileged operations.
-- Email and Password
-- JWT Authentication
-- Google OAuth (Future)
+- Email and password authentication via Supabase Auth
+- JWT Bearer token validation by FastAPI on every protected endpoint
+- Google OAuth (Future) via Supabase Auth
 
 ## Authorization
 
@@ -1623,8 +1661,9 @@ Role checks are performed at the service layer before executing privileged opera
 
 ## Password Security
 
-- Passwords are hashed using bcrypt.
-- Plain-text passwords are never stored.
+- Passwords are managed exclusively by Supabase Auth.
+- The application backend has no access to user passwords at any point.
+- Plain-text passwords are never transmitted to or stored by FastAPI.
 
 ## API Security
 
@@ -1926,38 +1965,35 @@ Simple and responsive charting library for dashboards.
 
 This section provides visual representations of NutriTrack's architecture, component interactions, data model, and deployment. These diagrams complement the textual design specifications and serve as implementation references.
 
+## Supabase
+
+Provides production-grade authentication (registration, login, session management, JWT issuance) and PostgreSQL hosting. Eliminates the need to build and maintain custom authentication, allowing development effort to focus on AI and business logic.
+
 ---
 
 ## 14.1 High-Level Architecture Diagram
 
 ```text
-                    +--------------------------------+
-                    |      React / Electron UI       |
-                    +---------------+----------------+
-                                    |
-                               HTTPS / JSON
-                                    |
-                    +---------------▼----------------+
-                    |         FastAPI Backend        |
-                    +---------------+----------------+
-                                    |
-      +--------------+--------------+--------------+--------------+
-      |              |              |              |              |
-      ▼              ▼              ▼              ▼              ▼
- Authentication   Meal Service   Dashboard    Water Service   Report Service
-      |              |              |              |              |
-      +--------------+------+-------+--------------+--------------+
-                             |
-                             ▼
-                     Nutrition Engine
-                             |
-                 +-----------+-----------+
-                 |                       |
-                 ▼                       ▼
-           AI Service             Repository Layer
-                 |                       |
-                 ▼                       ▼
-        OpenAI-Compatible API      PostgreSQL
+                                    React / Electron
+                        │
+                        ▼
+              Supabase Authentication
+                        │
+                 JWT Access Token
+                        │
+                        ▼
+                 FastAPI Backend
+                        │
+      ┌─────────────────┼─────────────────┐
+      ▼                 ▼                 ▼
+ AI Service      Nutrition Engine   Business Services
+      │                 │                 │
+      └─────────────────┼─────────────────┘
+                        ▼
+                Repository Layer
+                        │
+                        ▼
+            PostgreSQL (Supabase)
 ```
 
 ---
@@ -1975,8 +2011,8 @@ This section provides visual representations of NutriTrack's architecture, compo
 +-------------------------------------------------------------+
 |                       FastAPI Backend                       |
 |-------------------------------------------------------------|
-| Auth | Users | Profiles | Meals | Nutrition | Dashboard     |
-| Water | Reports | Recipes | Custom Foods | AI              |
+| JWT Validation | Users | Profiles | Meals | Nutrition | Dashboard |
+| Water | Reports | Recipes | Custom Foods | AI                    |
 +------------------------------+------------------------------+
                                |
                                ▼
@@ -1990,13 +2026,14 @@ This section provides visual representations of NutriTrack's architecture, compo
 ## 14.3 Class Diagram (Simplified)
 
 ```text
-+----------------+
-|     User       |
-+----------------+
-| id             |
-| email          |
-| password_hash  |
-+----------------+
++--------------------+
+|       User         |
++--------------------+
+| id                 |
+| supabase_user_id   |
+| email              |
+| role               |
++--------------------+
         |
         | 1
         |

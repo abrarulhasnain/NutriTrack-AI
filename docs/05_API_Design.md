@@ -233,8 +233,7 @@ General validation rules applied throughout the API:
 
 - Email must be unique.
 - Email must follow RFC-compliant format.
-- Password minimum length: 8 characters.
-- Password must contain uppercase, lowercase, number, and special character.
+- Password validation is handled by Supabase Auth. FastAPI does not validate or receive passwords.
 - Nutrition values cannot be negative.
 - Quantities must be greater than zero.
 - Water intake must be greater than zero.
@@ -249,6 +248,7 @@ General validation rules applied throughout the API:
 ---
 
 # 5. Authentication API
+
 
 **Status:** To be completed
 
@@ -350,7 +350,24 @@ Planned for future releases:
 
 ## Overview
 
-The Authentication API is responsible for user registration, authentication, authorization, and password management.
+## Overview
+
+Authentication (registration, login, password management, session management) is handled by Supabase Auth directly from the frontend. FastAPI does not expose registration or login endpoints.
+
+FastAPI provides the following auth-related endpoints for application use:
+
+### Version 1 FastAPI Endpoints
+
+- Get Current User (reads from application database using validated JWT)
+- Logout (client-side token removal; no FastAPI endpoint required)
+
+### Supabase Auth Flows (frontend to Supabase directly — no FastAPI involvement)
+
+- Register
+- Login
+- Email Verification
+- Password Reset
+- Change Password
 
 ### Version 1 Features
 
@@ -391,156 +408,25 @@ Every endpoint in this document follows the same specification:
 
 # 5.1 Register User
 
-## Purpose
+## Note
 
-Creates a new user account.
+User registration is handled directly by Supabase Auth from the frontend.
 
-### Endpoint
+FastAPI does not expose a registration endpoint.
 
-```
-POST /api/v1/auth/register
-```
-
-### Authentication
-
-Not Required
-
-### Request Headers
-
-```
-Content-Type: application/json
-```
-
-### Path Parameters
-
-None
-
-### Query Parameters
-
-None
-
-### Request Body
-
-```json
-{
-  "email": "user@example.com",
-  "password": "Password123!",
-  "confirm_password": "Password123!"
-}
-```
-
-### Success Response
-
-**201 Created**
-
-```json
-{
-  "success": true,
-  "message": "User registered successfully.",
-  "data": {
-    "user_id": "550e8400-e29b-41d4-a716-446655440000"
-  }
-}
-```
-
-### Error Responses
-
-| Status | Reason |
-|---------|--------|
-|400|Invalid request body|
-|409|Email already exists|
-|422|Validation failed|
-|500|Internal server error|
-
-### Validation Rules
-
-- Email is required.
-- Email must be valid.
-- Email must be unique.
-- Password minimum 8 characters.
-- Password must contain:
-  - Uppercase
-  - Lowercase
-  - Number
-  - Special character
-- Passwords must match.
-
-### Business Rules
-
-- Password is hashed using bcrypt before storage.
-- New users receive the default role: **user**.
-- User account is active immediately in Version 1.
+Upon successful Supabase registration, a corresponding User record is created in the application database (either via a Supabase webhook or on first authenticated request to FastAPI).
 
 ---
 
 # 5.2 Login
 
-## Purpose
+## Note
 
-Authenticates the user and returns a JWT access token.
+User login is handled directly by Supabase Auth from the frontend.
 
-### Endpoint
+FastAPI does not expose a login endpoint.
 
-```
-POST /api/v1/auth/login
-```
-
-### Authentication
-
-Not Required
-
-### Request Headers
-
-```
-Content-Type: application/json
-```
-
-### Request Body
-
-```json
-{
-  "email": "user@example.com",
-  "password": "Password123!"
-}
-```
-
-### Success Response
-
-**200 OK**
-
-```json
-{
-  "success": true,
-  "message": "Login successful.",
-  "data": {
-    "access_token": "<JWT_TOKEN>",
-    "token_type": "Bearer",
-    "expires_in": 3600
-  }
-}
-```
-
-### Error Responses
-
-| Status | Reason |
-|---------|--------|
-|401|Invalid email or password|
-|422|Validation failed|
-|500|Internal server error|
-
-### Validation Rules
-
-- Email is required.
-- Password is required.
-
-### Business Rules
-
-- Password is verified using bcrypt.
-- JWT token contains:
-  - user_id
-  - email
-  - role
-- Token expiration is 1 hour.
+Upon successful Supabase login, the frontend receives a JWT access token from Supabase and includes it in the Authorization header of all subsequent FastAPI requests.
 
 ---
 
@@ -583,11 +469,11 @@ None
 
 ### Business Rules
 
-Version 1 uses stateless JWT authentication.
+Logout is handled client-side by discarding the Supabase JWT.
 
-Logout is handled client-side by deleting the stored token.
+For server-side session invalidation, Supabase Auth's signOut method should be called from the frontend.
 
-Future versions may implement token blacklisting.
+FastAPI does not maintain session state.
 
 ---
 
@@ -633,87 +519,36 @@ Required
 
 ---
 
+
 # 5.5 Change Password
 
-## Purpose
+## Note
 
-Allows an authenticated user to change their password.
+Password changes are handled directly by Supabase Auth from the frontend.
 
-### Endpoint
+FastAPI does not expose a change-password endpoint.
 
-```
-PUT /api/v1/auth/change-password
-```
+Supabase Auth provides built-in password update flows that the frontend should use directly.
 
-### Authentication
 
-Required
-
-### Request Body
-
-```json
-{
-  "current_password": "OldPassword123!",
-  "new_password": "NewPassword123!"
-}
-```
-
-### Success Response
-
-**200 OK**
-
-```json
-{
-  "success": true,
-  "message": "Password changed successfully."
-}
-```
-
-### Error Responses
-
-| Status | Reason |
-|---------|--------|
-|400|Current password is incorrect|
-|401|Unauthorized|
-|422|Validation failed|
-|500|Internal server error|
-
-### Validation Rules
-
-- Current password must match.
-- New password must satisfy the password policy.
-- New password must be different from the current password.
-
-### Business Rules
-
-- Password is re-hashed before storage.
-- Existing JWT tokens remain valid until expiration in Version 1.
-
----
-
-## Authentication Flow
-
-```
-Register
-      │
-      ▼
-Database
-      │
-      ▼
-Login
-      │
-      ▼
-JWT Token
-      │
-      ▼
-Protected APIs
-      │
-      ▼
-Authorization Check
-      │
-      ▼
-Business Logic
-```
+Frontend
+    │
+    ├──── Register/Login ──► Supabase Auth
+    │                              │
+    │                    JWT Token issued
+    │                              │
+    │◄──────────────── JWT stored on client
+    │
+    │──── API Request ──► FastAPI
+    │    (Authorization: Bearer <JWT>)
+    │                        │
+    │                  JWT Validated
+    │                        │
+    │                 supabase_user_id extracted
+    │                        │
+    │                  Authorization Check
+    │                        │
+    │                   Business Logic
 
 # 6. User API
 
@@ -2372,10 +2207,9 @@ The API follows industry-standard security practices.
 
 ### Authentication
 
-- JWT Bearer Authentication
-- bcrypt password hashing
+- Supabase Auth handles registration, login, and password management
+- FastAPI validates Supabase-issued JWT Bearer tokens on every protected request
 - HTTPS in production
-
 ### Authorization
 
 - Role-Based Access Control (RBAC)
@@ -2447,7 +2281,7 @@ The NutriTrack API is designed to provide a secure, scalable, and maintainable R
 Key characteristics include:
 
 - RESTful architecture
-- JWT-based authentication
+- Supabase Auth for authentication; JWT Bearer token validation by FastAPI
 - Role-Based Access Control (RBAC)
 - Consistent request and response formats
 - Centralized validation

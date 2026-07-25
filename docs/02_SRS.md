@@ -32,22 +32,24 @@ Excluded from MVP:
 - Mobile apps
 - Social features
 
-## 1.3 Definitions
 | Term | Meaning |
 |---|---|
 | AI | Artificial Intelligence |
 | API | Application Programming Interface |
+| BaaS | Backend-as-a-Service |
+| JWT | JSON Web Token — a signed token issued by Supabase Auth and validated by FastAPI on every protected request |
 | MVP | Minimum Viable Product |
 | SRS | Software Requirements Specification |
 | SDD | Software Design Document |
+| Supabase | A Backend-as-a-Service platform providing authentication, PostgreSQL hosting, and file storage |
 
-## 1.4 References
 - Project Charter
 - IEEE 29148
 - FastAPI Documentation
 - React Documentation
 - PostgreSQL Documentation
 - OpenAI API Documentation
+- Supabase Documentation
 
 ## 1.5 Overview
 The remaining sections describe the product, requirements, interfaces, quality attributes, user stories, and future enhancements.
@@ -58,10 +60,9 @@ The remaining sections describe the product, requirements, interfaces, quality a
 
 ## 2.1 Product Perspective
 
-NutriTrack is an AI-powered nutrition tracking system designed to simplify dietary monitoring through natural language processing and automated nutritional analysis. The system follows a layered client-server architecture consisting of a React-based frontend, a FastAPI backend, a PostgreSQL database, and an external AI service for food extraction.
+NutriTrack is an AI-powered nutrition tracking system designed to simplify dietary monitoring through natural language processing and automated nutritional analysis. The system follows a hybrid client-server architecture consisting of a React-based frontend, a FastAPI backend, a PostgreSQL database, an external AI service for food extraction, and Supabase as a Backend-as-a-Service layer for authentication and database hosting.
 
-The frontend communicates with the backend using secure REST APIs. The backend is responsible for authentication, business logic, nutrition calculations, data persistence, and communication with the AI service. The AI service extracts structured food items from user-provided meal descriptions, while the backend calculates nutritional values using a local nutrition database.
-
+The frontend communicates with the backend using secure REST APIs. Authentication is handled by Supabase Auth. Upon successful login, Supabase issues a JWT access token to the client. The client includes this token in the Authorization header of every request to FastAPI. FastAPI validates the JWT before executing any protected business logic. The backend is responsible for business logic, nutrition calculations, data persistence, and communication with the AI service. The AI service extracts structured food items from user-provided meal descriptions, while the backend calculates nutritional values using a local nutrition database.
 ---
 
 ## 2.2 Product Functions
@@ -102,8 +103,6 @@ A registered user can:
 
 ---
 
-## 2.4 Operating Environment
-
 ### Client
 
 - Modern Web Browsers
@@ -116,7 +115,11 @@ A registered user can:
 
 ### Database
 
-- PostgreSQL
+- PostgreSQL (hosted via Supabase)
+
+### Authentication Service
+
+- Supabase Auth (user registration, login, session management, JWT issuance)
 
 ### AI Integration
 
@@ -124,20 +127,20 @@ A registered user can:
 
 ### Network
 
-An internet connection is required only for AI-powered food extraction.
-
----
+An internet connection is required for AI-powered food extraction and Supabase authentication services.
 
 ## 2.5 Design Constraints
 
 The following constraints apply to Version 1:
 
 - The system shall use REST APIs.
+- Authentication shall be delegated to Supabase Auth. FastAPI shall not implement its own authentication or password management.
+- FastAPI shall validate the Supabase-issued JWT on every protected endpoint before executing business logic.
+- The application database shall store a `supabase_user_id` reference to link application data to the authenticated user. It shall not store authentication credentials.
 - Nutrition values shall be calculated from the local nutrition database.
 - AI shall only identify food items and quantities.
 - Backend shall validate all AI responses before processing.
 - The application shall support future AI providers without major architectural changes.
-
 ---
 
 ## 2.6 Assumptions and Dependencies
@@ -151,9 +154,8 @@ The following constraints apply to Version 1:
 ### Dependencies
 
 - OpenAI-compatible API
-- PostgreSQL Database
-- Internet connection for AI request
-  
+- Supabase (authentication and PostgreSQL database hosting)
+- Internet connection for AI requests and Supabase authentication
 ---
 
 # 3. Functional Requirements
@@ -482,6 +484,22 @@ UI-5 Forms shall validate user input before submission.
 
 The system shall communicate with:
 
+### Supabase Auth
+
+Purpose:
+- Handle user registration, login, logout, email verification, password reset, and session management.
+- Issue JWT access tokens upon successful authentication.
+
+Communication:
+- HTTPS
+- JSON (Supabase client SDK / REST API)
+
+Interaction Model:
+- The frontend communicates with Supabase Auth directly for all authentication flows.
+- FastAPI receives the JWT from the client and validates it on every protected request. FastAPI does not communicate with Supabase Auth directly.
+
+---
+
 ### AI Service
 
 Purpose:
@@ -492,6 +510,20 @@ Communication:
 - JSON
 
 ---
+
+### PostgreSQL Database
+
+Purpose:
+- Store application data (user profiles, meals, nutrition records, water logs, custom foods).
+
+Hosting:
+- Managed via Supabase.
+
+Communication:
+- SQLAlchemy ORM
+
+---
+
 
 ### PostgreSQL Database
 
@@ -557,13 +589,15 @@ NFR-10 Previously saved meals and reports shall remain accessible.
 
 ## 5.4 Security
 
-NFR-11 Passwords shall be securely hashed.
+NFR-11 Passwords shall be managed exclusively by Supabase Auth. The application backend shall not store, transmit, or have access to user passwords in any form.
+
+NFR-11a FastAPI shall reject any request to a protected endpoint that does not include a valid, unexpired Supabase JWT token.
 
 NFR-12 Sensitive data shall never be stored in plain text.
 
 NFR-13 All API communication shall use HTTPS.
 
-NFR-14 Users shall only access their own data.
+NFR-14 Users shall only access their own data. FastAPI shall enforce this by filtering all database queries using the authenticated user's `supabase_user_id`.
 
 ---
 
@@ -624,6 +658,24 @@ Guest User
 
 ### Main Flow
 1. User opens the registration page.
+2. User enters name, email, and password.
+3. Frontend submits credentials to Supabase Auth.
+4. Supabase Auth validates the input and creates the user account.
+5. Supabase Auth sends an email verification link to the user.
+6. User is redirected to profile setup upon successful registration.
+
+### Postconditions
+- User account is created in Supabase Auth.
+- User receives an email verification link.
+
+### Primary Actor
+Guest User
+
+### Preconditions
+- User is not registered.
+
+### Main Flow
+1. User opens the registration page.
 2. User enters required information.
 3. System validates the input.
 4. User account is created.
@@ -635,6 +687,25 @@ Guest User
 ---
 
 ## UC-02 Login
+## UC-02 Login
+
+### Primary Actor
+Registered User
+
+### Preconditions
+- User account exists in Supabase Auth.
+
+### Main Flow
+1. User enters email and password.
+2. Frontend submits credentials to Supabase Auth.
+3. Supabase Auth validates credentials and issues a JWT access token.
+4. Frontend stores the JWT and includes it in the Authorization header of all subsequent API requests.
+5. Dashboard is displayed.
+
+### Postconditions
+- User session is started.
+- A valid JWT is available on the client for authenticated API calls.
+- 
 
 ### Primary Actor
 Registered User

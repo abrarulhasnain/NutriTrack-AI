@@ -62,8 +62,8 @@ NutriTrack uses a relational database (PostgreSQL) designed according to the fol
 - High query performance
 - Clear entity relationships
 - Scalable schema design
-- Separation of authentication and profile data
-
+- Authentication credentials stored exclusively in Supabase Auth; application database stores only a supabase_user_id reference
+  
 The system uses controlled denormalization only where justified for performance (e.g., meal nutrition totals).
 
 ---
@@ -150,7 +150,7 @@ unless explicitly unnecessary.
 The schema follows these rules:
 
 - No duplicated user information.
-- Authentication is separated from profile data.
+- Authentication credentials are managed by Supabase Auth and are not stored in this database. The User table stores only a supabase_user_id reference.
 - Nutrition calculations occur outside the database.
 - Nutrition totals are stored for performance.
 - Foreign key constraints are enforced.
@@ -168,20 +168,14 @@ The schema follows these rules:
 Stores authentication and account information.
 
 ## Table Definition
-
-| Column | Data Type | Constraints | Description |
-|---------|-----------|-------------|-------------|
-| id | UUID | PRIMARY KEY | Unique user identifier |
-| email | VARCHAR(255) | UNIQUE, NOT NULL | User email |
-| password_hash | VARCHAR(255) | NOT NULL | Encrypted password |
-| auth_provider | VARCHAR(50) | NOT NULL DEFAULT 'email' | Authentication provider |
-| is_active | BOOLEAN | NOT NULL DEFAULT TRUE | Account status |
-| created_at | TIMESTAMP | NOT NULL | Record creation time |
-| updated_at | TIMESTAMP | NOT NULL | Last update time |
-
-| Column | Data Type   | Constraints             | Description |
-| ------ | ----------- | ----------------------- | ----------- |
-| role   | VARCHAR(20) | NOT NULL DEFAULT 'user' | User role   |
+| Column             | Data Type     | Constraints                  | Description                                        |
+|--------------------|---------------|------------------------------|----------------------------------------------------|
+| `id`               | `UUID`        | `PRIMARY KEY`                | Application-level user identifier                  |
+| `supabase_user_id` | `UUID`        | `UNIQUE`, `NOT NULL`         | References the Supabase Auth user                  |
+| `email`            | `VARCHAR(255)`| `NOT NULL`                   | Display/lookup copy (authoritative copy in Supabase Auth) |
+| `role`             | `VARCHAR(20)` | `NOT NULL DEFAULT 'user'`    | Application role (`user` / `admin`)                |
+| `created_at`       | `TIMESTAMP`   | `NOT NULL`                   | Record creation time                               |
+| `updated_at`       | `TIMESTAMP`   | `NOT NULL`                   | Last update time                                   |
 
 ### Allowed Roles
 
@@ -615,9 +609,9 @@ All foreign keys shall be enforced.
 
 ## Unique Constraints
 
-User.email
+User.supabase_user_id must be unique.
 
-must be unique.
+Note: Email uniqueness is enforced by Supabase Auth. The email stored in the User table is a display-only copy and does not carry a uniqueness constraint in the application database.
 
 ---
 
@@ -674,7 +668,8 @@ Indexes improve query performance.
 
 ## User
 
-- email (Unique)
+- supabase_user_id (Unique)
+- email
 
 ---
 
@@ -764,7 +759,7 @@ This section provides a business-level description of each entity in the databas
 
 | Entity | Description |
 |---------|-------------|
-| User | Stores authentication and account information. |
+| User | Links application data to the Supabase Auth identity via supabase_user_id. Does not store authentication credentials. |
 | UserProfile | Stores personal, health, and fitness information used to calculate nutrition goals. |
 | Food | Master nutrition database containing standardized nutritional values. |
 | Meal | Represents a meal logged by a user. |
@@ -838,8 +833,7 @@ Key characteristics include:
 - Third Normal Form (3NF)
 - Strong referential integrity
 - Feature-oriented schema
-- Separation of authentication and profile data
-- Dedicated Nutrition Engine ownership for nutrition calculations
+- Authentication credentials managed externally by Supabase Auth; application database holds only a supabase_user_id reference- Dedicated Nutrition Engine ownership for nutrition calculations
 - Controlled denormalization for performance
 - Migration-based schema management using Alembic
 
