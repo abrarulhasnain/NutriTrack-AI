@@ -12,6 +12,7 @@ class User(Base):
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     supabase_user_id = Column(UUID(as_uuid=True), unique=True, nullable=False)
     email = Column(String(255), nullable=False)
+    full_name = Column(String, nullable=True)
     role = Column(String(20), nullable=False, default="user")
     is_active = Column(Boolean, default=True)
     created_at = Column(DateTime(timezone=True), default=lambda: datetime.now(timezone.utc))
