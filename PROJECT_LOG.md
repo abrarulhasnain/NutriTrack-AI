@@ -45,3 +45,32 @@
 3. Begin Meals module (Abrar) — models already exist, build schemas → repository → service → router
 4. Begin AI module (Abrar) — food extraction only, no nutrition calculation
 5. Manahil to begin Profiles module using same layered pattern
+
+## 2026-08-01
+
+### Development Session 3 — Meals Module + Bug Fixes
+
+#### Foods Table Seeding
+* Created `app/database/seed_foods.py` — curated dataset of 95 common foods (South Asian + international: staples, proteins, daal, dairy, vegetables, fruits, nuts, prepared dishes, snacks, beverages)
+* Seed script uses SQLAlchemy session, checks for existing data before inserting (idempotent)
+* Successfully seeded 95 rows into `foods` table ✅
+
+#### Meals Module (models → schemas → repository → service → router)
+* `app/meals/schemas.py` — MealItemCreate, MealCreate, MealItemResponse, MealResponse ✅
+* `app/meals/repository.py` — get_food_by_id, get_custom_food_by_id, create_meal, get_meal_by_id, get_meals_by_user, delete_meal ✅
+* `app/meals/service.py` — create_meal() includes Nutrition Engine logic (scales food's per-serving nutrition values by requested quantity), get_meal, get_meals, delete_meal ✅
+* `app/meals/router.py` — POST /meals/, GET /meals/, GET /meals/{meal_id}, DELETE /meals/{meal_id} ✅
+
+#### Nutrition Engine (basic implementation)
+* Scaling formula: `scale = requested_quantity / food.serving_size`, applied to calories/protein/carbs/fat/fiber/sugar
+* Currently manual-entry based (user provides food_id + quantity); AI-based text parsing deferred to AI module
+
+#### Architecture Decision — HTTP Status Codes
+* Discovered error responses were always returning 200 OK regardless of actual error (FastAPI default behavior when returning plain dict)
+* Fixed by wrapping error responses in `JSONResponse(status_code=X, content=error_response(...))`
+* create_meal errors → 400 Bad Request (invalid/missing food references in request)
+* get_meal / delete_meal errors → 404 Not Found (specific resource doesn't exist)
+* get_meals (list endpoint) intentionally has no try/except — empty results are valid, not errors
+
+#### Bug Fixes — Model Relationship Chain
+* Root cause: `users/models.py` was missing reciprocal `relationship()` declarations for modules built by both
