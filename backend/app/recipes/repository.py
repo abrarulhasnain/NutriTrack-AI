@@ -1,7 +1,9 @@
-from sqlalchemy.orm import Session
-from app.recipes.models import Recipe
-from app.recipes.schemas import RecipeCreate
 from uuid import UUID
+
+from sqlalchemy.orm import Session
+
+from app.recipes.models import Recipe
+from app.recipes.schemas import RecipeCreate, RecipeUpdate
 
 def create_recipe(db: Session, recipe_data: RecipeCreate, user_id: UUID):
     recipe = Recipe(
@@ -40,13 +42,26 @@ def get_recipe_by_id(
 def update_recipe(
     db: Session,
     recipe: Recipe,
-    recipe_data: RecipeCreate,
+    recipe_data: RecipeUpdate,
 ):
-    recipe.name = recipe_data.name
-    recipe.description = recipe_data.description
-    recipe.servings = recipe_data.servings
+    if recipe_data.name is not None:
+        recipe.name = recipe_data.name
+
+    if recipe_data.description is not None:
+        recipe.description = recipe_data.description
+
+    if recipe_data.servings is not None:
+        recipe.servings = recipe_data.servings
 
     db.commit()
     db.refresh(recipe)
 
     return recipe
+
+
+def delete_recipe(
+    db: Session,
+    recipe: Recipe,
+) -> None:
+    db.delete(recipe)
+    db.commit()
