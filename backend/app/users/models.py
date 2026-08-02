@@ -1,10 +1,10 @@
 ﻿from sqlalchemy import Column, String, Boolean, DateTime
+from sqlalchemy.orm import relationship
 from sqlalchemy.dialects.postgresql import UUID
 from datetime import datetime, timezone
 import uuid
 
 from app.database.base import Base
-
 
 class User(Base):
     __tablename__ = "users"
@@ -16,4 +16,26 @@ class User(Base):
     role = Column(String(20), nullable=False, default="user")
     is_active = Column(Boolean, default=True)
     created_at = Column(DateTime(timezone=True), default=lambda: datetime.now(timezone.utc))
-    updated_at = Column(DateTime(timezone=True), default=lambda: datetime.now(timezone.utc), onupdate=lambda: datetime.now(timezone.utc))
+    updated_at = Column(
+        DateTime(timezone=True),
+        default=lambda: datetime.now(timezone.utc),
+        onupdate=lambda: datetime.now(timezone.utc),
+    )
+
+    recipes = relationship(
+        "Recipe",
+        back_populates="user",
+        cascade="all, delete-orphan",
+    )
+    profile = relationship(
+    "UserProfile",
+    back_populates="user",
+    uselist=False,
+    cascade="all, delete-orphan",
+)
+
+    custom_foods = relationship(
+    "CustomFood",
+    back_populates="user",
+    cascade="all, delete-orphan",
+)

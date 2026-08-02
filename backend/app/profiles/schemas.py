@@ -1,5 +1,5 @@
 from decimal import Decimal
-
+from uuid import UUID
 from pydantic import BaseModel, ConfigDict
 
 
@@ -34,7 +34,7 @@ class UserProfileUpdate(BaseModel):
 
 
 class UserProfileResponse(BaseModel):
-    user_id: str
+    user_id: UUID
     full_name: str
     age: int
     gender: str
