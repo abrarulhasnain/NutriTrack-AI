@@ -16,10 +16,10 @@ logger.info("Starting NutriTrack application")
 app = FastAPI(title=settings.app_name)
 
 # Register Routers
-app.include_router(recipes_router)
-app.include_router(profiles_router)
 
 app.include_router(users_router)
+app.include_router(profiles_router)
+app.include_router(recipes_router)
 
 
 @app.get("/")
