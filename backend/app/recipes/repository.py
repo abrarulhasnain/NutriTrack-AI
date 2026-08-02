@@ -1,67 +1,61 @@
+from sqlalchemy.orm import Session, joinedload
+from app.recipes.models import Recipe, RecipeItem
+from app.nutrition.models import Food
+from app.custom_foods.models import CustomFood
 from uuid import UUID
 
-from sqlalchemy.orm import Session
 
-from app.recipes.models import Recipe
-from app.recipes.schemas import RecipeCreate, RecipeUpdate
+def get_food_by_id(db: Session, food_id: UUID):
+    return db.query(Food).filter(Food.id == food_id).first()
 
-def create_recipe(db: Session, recipe_data: RecipeCreate, user_id: UUID):
-    recipe = Recipe(
-        user_id=user_id,
-        name=recipe_data.name,
-        description=recipe_data.description,
-        servings=recipe_data.servings,
-    )
 
+def get_custom_food_by_id(db: Session, custom_food_id: UUID):
+    return db.query(CustomFood).filter(CustomFood.id == custom_food_id).first()
+
+
+def create_recipe(db: Session, recipe: Recipe):
     db.add(recipe)
     db.commit()
     db.refresh(recipe)
-
     return recipe
 
+
 def get_all_recipes(db: Session, user_id: UUID):
+    # joinedload ensures recipe items are fetched in the same query, avoiding N+1 queries
     return (
         db.query(Recipe)
+        .options(joinedload(Recipe.items))
         .filter(Recipe.user_id == user_id)
         .order_by(Recipe.created_at.desc())
         .all()
     )
-def get_recipe_by_id(
-    db: Session,
-    recipe_id: UUID,
-    user_id: UUID,
-):
+
+
+def get_recipe_by_id(db: Session, recipe_id: UUID, user_id: UUID):
     return (
         db.query(Recipe)
+        .options(joinedload(Recipe.items))
         .filter(
             Recipe.id == recipe_id,
             Recipe.user_id == user_id,
         )
         .first()
     )
-def update_recipe(
-    db: Session,
-    recipe: Recipe,
-    recipe_data: RecipeUpdate,
-):
-    if recipe_data.name is not None:
-        recipe.name = recipe_data.name
 
-    if recipe_data.description is not None:
-        recipe.description = recipe_data.description
 
-    if recipe_data.servings is not None:
-        recipe.servings = recipe_data.servings
+def replace_recipe_items(db: Session, recipe: Recipe, new_items: list[RecipeItem]):
+    # Used during update: remove old items and attach the new ones
+    for old_item in recipe.items:
+        db.delete(old_item)
+    recipe.items = new_items
 
+
+def save_recipe(db: Session, recipe: Recipe):
     db.commit()
     db.refresh(recipe)
-
     return recipe
 
 
-def delete_recipe(
-    db: Session,
-    recipe: Recipe,
-) -> None:
+def delete_recipe(db: Session, recipe: Recipe):
     db.delete(recipe)
     db.commit()
