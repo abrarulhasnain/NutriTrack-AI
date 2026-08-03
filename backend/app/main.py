@@ -4,6 +4,7 @@ from app.core.config import settings
 from app.core.logging import logger, setup_logging
 from app.users.router import router as users_router
 from app.meals.router import router as meals_router
+from app.ai.router import router as ai_router
 
 setup_logging()
 logger.info("Starting NutriTrack application")
@@ -12,6 +13,8 @@ app = FastAPI(title=settings.app_name)
 
 app.include_router(users_router)
 app.include_router(meals_router)
+app.include_router(ai_router)
+
 
 
 @app.get("/")
