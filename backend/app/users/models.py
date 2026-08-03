@@ -28,14 +28,20 @@ class User(Base):
         cascade="all, delete-orphan",
     )
     profile = relationship(
-    "UserProfile",
-    back_populates="user",
-    uselist=False,
-    cascade="all, delete-orphan",
-)
+        "UserProfile",
+        back_populates="user",
+        uselist=False,
+        cascade="all, delete-orphan",
+    )
 
     custom_foods = relationship(
-    "CustomFood",
-    back_populates="user",
-    cascade="all, delete-orphan",
-)
+        "CustomFood",
+        back_populates="user",
+        cascade="all, delete-orphan",
+    )
+
+    water_logs = relationship(
+        "WaterLog",
+        back_populates="user",
+        cascade="all, delete-orphan",
+    )

@@ -5,10 +5,12 @@ from app.core.logging import logger, setup_logging
 from app.recipes.router import router as recipes_router
 from app.profiles.router import router as profiles_router
 from app.custom_foods.router import router as custom_foods_router
+from app.water.router import router as water_router
 from app.users.models import User
 from app.recipes.models import Recipe, RecipeItem
 from app.custom_foods.models import CustomFood
 from app.nutrition.models import Food
+from app.water.models import WaterLog
 from app.users.router import router as users_router
 
 setup_logging()
@@ -23,6 +25,7 @@ app.include_router(users_router)
 app.include_router(profiles_router)
 app.include_router(recipes_router)
 app.include_router(custom_foods_router)
+app.include_router(water_router)
 
 
 @app.get("/")
