@@ -320,3 +320,66 @@ Status:
 
 #### Bug Fixes — Model Relationship Chain
 * Root cause: `users/models.py` was missing reciprocal `relationship()` declarations for modules built by both
+
+## 2026-08-02
+
+### Development Session 4 — Recipes Module Review & Fix (Manahil's Branch)
+
+#### Cross-Branch Testing Setup
+* Learned to fetch, checkout, and switch between teammate branches via GitHub Desktop
+* Learned about branch stashing when switching with uncommitted changes
+* Confirmed: each branch is independent — model relationship fixes must be applied per-branch, not globally
+
+#### Reviewed Manahil's `recipes` Module (branch: manahil/recipes)
+Found and fixed the following issues:
+
+**Critical bugs (would crash on import):**
+* `repository.py` — `update_recipe()` had missing closing `):` in function signature (syntax error)
+* `service.py` — `get_recipe()` had missing closing `):` in function signature (syntax error)
+
+**Project convention violations:**
+* Router was using `response_model=RecipeResponse` + `HTTPException` directly instead of `success_response()`/`error_response()` pattern used elsewhere in the project
+* Fixed to match Meals module convention
+
+**Missing functionality:**
+* No Recipe Items (ingredients) CRUD existed — recipes had no way to attach food items
+* Added Nutrition Engine logic to recipes/service.py (same scale = quantity/serving_size pattern as Meals)
+* No PUT (update) or DELETE endpoints existed in router — added both
+* `RecipeResponse` schema was missing `total_carbs` field — added
+
+**Model relationship fix (same as Meals module, applied to this branch separately):**
+* `users/models.py` on `manahil/recipes` branch was missing reciprocal relationships (`meals`, `custom_foods`, `profile`, `water_logs`, `recipes`)
+* `database/init_db.py` on this branch was empty — populated with all model imports
+
+#### End-to-End Testing (manahil/recipes branch)
+* POST /recipes/ — 200 OK (tested nutrition calculation correctness: 250g quantity vs 250g serving_size = full serving = 400 calories, matched expected)
+* DELETE /recipes/{id} — 200 OK (valid), 404 Not Found (already deleted) ✅
+* PUT /recipes/{id} — 200 OK (servings update confirmed)
+* GET /recipes/, GET /recipes/{id} — verified working
+
+#### Important Learning — Unit/Quantity Design Limitation
+* Discovered: Nutrition Engine (both Meals and Recipes) assumes `quantity` is in the same unit as the food's `serving_size` — it does NOT do unit conversion (e.g., "piece" vs "g")
+* Example bug found during testing: sending quantity=2, unit="piece" for a food with serving_size=250g resulted in incorrect (tiny) calorie calculation, because the engine just divided 2/250
+* This is a known, accepted limitation for now — documented for future improvement (potential unit-conversion layer)
+* Both Abrar and Manahil should keep this in mind when testing/using quantity + unit fields
+
+#### Commit
+* Committed and pushed all recipes fixes to `manahil/recipes` branch
+* Commit message: "fix: recipes module bugs + relationship fixes + full nutrition engine"
+
+### Current Status
+* Users module ✅ (abrar/users-auth-module branch)
+* Auth module ✅ (abrar/users-auth-module branch)
+* Meals module ✅ (abrar/users-auth-module branch)
+* Recipes module ✅ (manahil/recipes branch — reviewed, fixed, and tested by Abrar)
+* Custom Foods module ❌ (not started by Manahil yet)
+* AI module ❌ (not started)
+* Profiles module ❌ (model only, no schemas/repo/service/router)
+* Water module ❌ (model only, no schemas/repo/service/router)
+
+### Next Session
+1. Switch back to abrar/users-auth-module branch (confirm own work still intact)
+2. Communicate recipes fixes + learnings to Manahil (esp. quantity/unit limitation)
+3. Begin AI module — food text extraction only (no nutrition calculation, per project rule)
+4. Eventually: create Pull Requests to merge both abrar/users-auth-module and manahil/recipes into main
+5. Manahil to start Custom Foods module next
