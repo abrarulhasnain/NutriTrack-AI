@@ -14,6 +14,8 @@ from app.water.models import WaterLog
 from app.users.router import router as users_router
 from app.meals.router import router as meals_router
 from app.ai.router import router as ai_router
+from app.dashboard.router import router as dashboard_router
+from app.reports.router import router as reports_router
 
 setup_logging()
 logger.info("Starting NutriTrack application")
@@ -27,6 +29,8 @@ app.include_router(profiles_router)
 app.include_router(recipes_router)
 app.include_router(custom_foods_router)
 app.include_router(water_router)
+app.include_router(dashboard_router)
+app.include_router(reports_router)
 
 
 @app.get("/")
