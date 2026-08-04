@@ -13,6 +13,7 @@ class Settings(BaseSettings):
     supabase_url: str
     supabase_anon_key: str
     groq_api_key: str
+    usda_api_key: str
 
     model_config = SettingsConfigDict(
         env_file=str(BASE_DIR / ".env"),

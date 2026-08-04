@@ -5,25 +5,40 @@ from sqlalchemy.orm import Session
 from app.nutrition.models import Food
 
 
-def normalize_food_name(name: str) -> str:
+def tokenize(name: str) -> set[str]:
     """
-    Cleans a food name for comparison: lowercase, removes punctuation,
-    and sorts words alphabetically so word order does not affect matching.
-    e.g. "Egg (boiled)" and "boiled egg" both become "boiled egg"
+    Breaks a food name into a set of normalized words: lowercase,
+    punctuation removed, simple plural stripping (eggs -> egg).
     """
     cleaned = re.sub(r"[^\w\s]", " ", name.lower())
-    words = sorted(cleaned.split())
-    return " ".join(words)
+    words = cleaned.split()
+    normalized = {w[:-1] if w.endswith("s") and len(w) > 3 else w for w in words}
+    return normalized
 
 
 def calculate_similarity(name_a: str, name_b: str) -> float:
     """
-    Returns a similarity score between 0 and 1 for two food names,
-    after normalizing both so word order/punctuation does not matter.
+    Word-based similarity score between 0 and 1.
+    Primarily checks how many words overlap (relative to the shorter
+    name), so a short query like "rice" scores well against a longer
+    database name like "White rice (cooked)" instead of being penalized
+    for the length difference, as plain character comparison would do.
+    Character-level similarity is used only as a secondary tiebreaker.
     """
-    normalized_a = normalize_food_name(name_a)
-    normalized_b = normalize_food_name(name_b)
-    return SequenceMatcher(None, normalized_a, normalized_b).ratio()
+    words_a = tokenize(name_a)
+    words_b = tokenize(name_b)
+
+    if not words_a or not words_b:
+        return 0.0
+
+    common_words = words_a & words_b
+    word_overlap_score = len(common_words) / min(len(words_a), len(words_b))
+
+    char_score = SequenceMatcher(
+        None, " ".join(sorted(words_a)), " ".join(sorted(words_b))
+    ).ratio()
+
+    return round((0.7 * word_overlap_score) + (0.3 * char_score), 4)
 
 
 def find_best_matching_food(db: Session, extracted_name: str) -> tuple[Food | None, float]:

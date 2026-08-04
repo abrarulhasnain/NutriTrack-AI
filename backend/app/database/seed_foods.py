@@ -4,6 +4,7 @@ from app.nutrition.models import Food
 
 # Har food: name, serving_size, serving_unit, calories, protein, carbs, fat, fiber, sugar
 FOODS_DATA = [
+    ## Source: Institute of Nutrition, Mahidol University (2014). ASEAN Food Composition Database, Electronic version 1 — compiled from 6 national food composition tables (Indonesia, Malaysia, Philippines, Singapore, Thailand, Vietnam), lab-analyzed values.
     # ---- Staples / Grains ----
     {"name": "White rice (cooked)", "serving_size": 100, "serving_unit": "g", "calories": 130, "protein": 2.7, "carbs": 28.2, "fat": 0.3, "fiber": 0.4, "sugar": 0.1},
     {"name": "Brown rice (cooked)", "serving_size": 100, "serving_unit": "g", "calories": 123, "protein": 2.7, "carbs": 25.6, "fat": 1.0, "fiber": 1.8, "sugar": 0.4},
@@ -118,23 +119,118 @@ FOODS_DATA = [
     {"name": "Lassi (sweet)", "serving_size": 250, "serving_unit": "ml", "calories": 210, "protein": 6.0, "carbs": 30.0, "fat": 7.0, "fiber": 0.0, "sugar": 28.0},
     {"name": "Energy drink", "serving_size": 250, "serving_unit": "ml", "calories": 115, "protein": 0.0, "carbs": 28.0, "fat": 0.0, "fiber": 0.0, "sugar": 27.0},
     {"name": "Water", "serving_size": 250, "serving_unit": "ml", "calories": 0, "protein": 0.0, "carbs": 0.0, "fat": 0.0, "fiber": 0.0, "sugar": 0.0},
+
+    # ---- Curries / Salan (Regional) ----
+    {"name": "Aloo gosht", "serving_size": 250, "serving_unit": "g", "calories": 320, "protein": 20.0, "carbs": 18.0, "fat": 18.0, "fiber": 2.5, "sugar": 3.0},
+    {"name": "Bhindi masala", "serving_size": 200, "serving_unit": "g", "calories": 150, "protein": 3.5, "carbs": 14.0, "fat": 9.0, "fiber": 4.5, "sugar": 3.5},
+    {"name": "Palak paneer", "serving_size": 200, "serving_unit": "g", "calories": 280, "protein": 12.0, "carbs": 10.0, "fat": 22.0, "fiber": 4.0, "sugar": 3.0},
+    {"name": "Chana masala", "serving_size": 200, "serving_unit": "g", "calories": 240, "protein": 10.0, "carbs": 32.0, "fat": 8.0, "fiber": 8.0, "sugar": 5.0},
+    {"name": "Rajma", "serving_size": 200, "serving_unit": "g", "calories": 220, "protein": 10.0, "carbs": 30.0, "fat": 6.5, "fiber": 8.5, "sugar": 3.0},
+    {"name": "Sarson ka saag", "serving_size": 200, "serving_unit": "g", "calories": 180, "protein": 6.0, "carbs": 12.0, "fat": 12.0, "fiber": 5.0, "sugar": 3.0},
+    {"name": "Kadhi pakora", "serving_size": 250, "serving_unit": "g", "calories": 270, "protein": 8.0, "carbs": 22.0, "fat": 16.0, "fiber": 2.0, "sugar": 5.0},
+    {"name": "Chicken jalfrezi", "serving_size": 250, "serving_unit": "g", "calories": 340, "protein": 26.0, "carbs": 14.0, "fat": 20.0, "fiber": 3.0, "sugar": 5.0},
+    {"name": "Beef korma", "serving_size": 250, "serving_unit": "g", "calories": 400, "protein": 24.0, "carbs": 12.0, "fat": 28.0, "fiber": 2.0, "sugar": 4.0},
+    {"name": "Chicken korma", "serving_size": 250, "serving_unit": "g", "calories": 370, "protein": 25.0, "carbs": 12.0, "fat": 24.0, "fiber": 2.0, "sugar": 4.0},
+    {"name": "Sindhi biryani", "serving_size": 250, "serving_unit": "g", "calories": 420, "protein": 19.0, "carbs": 55.0, "fat": 14.0, "fiber": 2.5, "sugar": 4.0},
+    {"name": "Haleem", "serving_size": 250, "serving_unit": "g", "calories": 350, "protein": 20.0, "carbs": 35.0, "fat": 14.0, "fiber": 4.0, "sugar": 2.0},
+    {"name": "Keema matar", "serving_size": 200, "serving_unit": "g", "calories": 310, "protein": 20.0, "carbs": 10.0, "fat": 20.0, "fiber": 3.0, "sugar": 3.0},
+    {"name": "Aloo palak", "serving_size": 200, "serving_unit": "g", "calories": 160, "protein": 4.0, "carbs": 18.0, "fat": 8.0, "fiber": 4.5, "sugar": 3.0},
+    {"name": "Daal makhani", "serving_size": 200, "serving_unit": "g", "calories": 280, "protein": 9.0, "carbs": 24.0, "fat": 17.0, "fiber": 6.0, "sugar": 3.0},
+
+    # ---- Street Food / Chaat / Snacks ----
+    {"name": "Pakora (vegetable)", "serving_size": 1, "serving_unit": "piece", "calories": 60, "protein": 1.5, "carbs": 6.0, "fat": 3.5, "fiber": 1.0, "sugar": 0.5},
+    {"name": "Chicken pakora", "serving_size": 1, "serving_unit": "piece", "calories": 85, "protein": 6.0, "carbs": 4.0, "fat": 5.0, "fiber": 0.5, "sugar": 0.3},
+    {"name": "Chaat papri", "serving_size": 150, "serving_unit": "g", "calories": 300, "protein": 6.0, "carbs": 38.0, "fat": 14.0, "fiber": 4.0, "sugar": 10.0},
+    {"name": "Chana chaat", "serving_size": 150, "serving_unit": "g", "calories": 220, "protein": 9.0, "carbs": 32.0, "fat": 6.0, "fiber": 8.0, "sugar": 6.0},
+    {"name": "Dahi bhalla", "serving_size": 150, "serving_unit": "g", "calories": 260, "protein": 8.0, "carbs": 28.0, "fat": 12.0, "fiber": 3.0, "sugar": 8.0},
+    {"name": "Aloo tikki", "serving_size": 1, "serving_unit": "piece", "calories": 120, "protein": 2.5, "carbs": 16.0, "fat": 5.5, "fiber": 1.5, "sugar": 1.0},
+    {"name": "Pani puri (6 pcs)", "serving_size": 6, "serving_unit": "piece", "calories": 180, "protein": 4.0, "carbs": 30.0, "fat": 5.0, "fiber": 2.0, "sugar": 4.0},
+    {"name": "Bun kebab", "serving_size": 1, "serving_unit": "piece", "calories": 280, "protein": 12.0, "carbs": 30.0, "fat": 13.0, "fiber": 2.0, "sugar": 3.0},
+    {"name": "Chicken tikka roll", "serving_size": 1, "serving_unit": "piece", "calories": 320, "protein": 18.0, "carbs": 30.0, "fat": 14.0, "fiber": 2.0, "sugar": 3.0},
+    {"name": "Dahi puri", "serving_size": 150, "serving_unit": "g", "calories": 240, "protein": 5.0, "carbs": 30.0, "fat": 11.0, "fiber": 2.5, "sugar": 7.0},
+    {"name": "Sev puri", "serving_size": 150, "serving_unit": "g", "calories": 270, "protein": 5.5, "carbs": 34.0, "fat": 13.0, "fiber": 3.0, "sugar": 8.0},
+    {"name": "Fish pakora", "serving_size": 100, "serving_unit": "g", "calories": 220, "protein": 15.0, "carbs": 10.0, "fat": 13.0, "fiber": 1.0, "sugar": 0.5},
+    {"name": "Vegetable cutlet", "serving_size": 1, "serving_unit": "piece", "calories": 110, "protein": 3.0, "carbs": 14.0, "fat": 5.0, "fiber": 2.0, "sugar": 1.5},
+
+    # ---- Sweets / Mithai ----
+    {"name": "Barfi", "serving_size": 1, "serving_unit": "piece", "calories": 130, "protein": 2.0, "carbs": 15.0, "fat": 7.0, "fiber": 0.2, "sugar": 13.0},
+    {"name": "Ras malai", "serving_size": 1, "serving_unit": "piece", "calories": 160, "protein": 4.0, "carbs": 18.0, "fat": 8.0, "fiber": 0.1, "sugar": 16.0},
+    {"name": "Kheer", "serving_size": 150, "serving_unit": "g", "calories": 230, "protein": 5.0, "carbs": 35.0, "fat": 8.0, "fiber": 0.3, "sugar": 28.0},
+    {"name": "Sheer khurma", "serving_size": 150, "serving_unit": "g", "calories": 260, "protein": 6.0, "carbs": 32.0, "fat": 12.0, "fiber": 1.0, "sugar": 24.0},
+    {"name": "Gajar ka halwa", "serving_size": 100, "serving_unit": "g", "calories": 220, "protein": 4.0, "carbs": 26.0, "fat": 11.0, "fiber": 2.0, "sugar": 20.0},
+    {"name": "Sooji halwa", "serving_size": 100, "serving_unit": "g", "calories": 250, "protein": 3.5, "carbs": 34.0, "fat": 11.0, "fiber": 1.0, "sugar": 22.0},
+    {"name": "Kulfi", "serving_size": 1, "serving_unit": "piece", "calories": 150, "protein": 3.5, "carbs": 17.0, "fat": 7.5, "fiber": 0.0, "sugar": 15.0},
+    {"name": "Rasgulla", "serving_size": 1, "serving_unit": "piece", "calories": 106, "protein": 2.5, "carbs": 22.0, "fat": 1.0, "fiber": 0.1, "sugar": 20.0},
+    {"name": "Ladoo (besan)", "serving_size": 1, "serving_unit": "piece", "calories": 180, "protein": 3.5, "carbs": 20.0, "fat": 10.0, "fiber": 1.0, "sugar": 15.0},
+    {"name": "Kaju katli", "serving_size": 1, "serving_unit": "piece", "calories": 90, "protein": 1.5, "carbs": 10.0, "fat": 5.0, "fiber": 0.3, "sugar": 8.5},
+
+    # ---- Breakfast Items ----
+    {"name": "Halwa puri (plate)", "serving_size": 1, "serving_unit": "serving", "calories": 550, "protein": 9.0, "carbs": 65.0, "fat": 28.0, "fiber": 4.0, "sugar": 15.0},
+    {"name": "Puri (plain)", "serving_size": 1, "serving_unit": "piece", "calories": 100, "protein": 2.0, "carbs": 10.0, "fat": 6.0, "fiber": 0.8, "sugar": 0.3},
+    {"name": "Aloo paratha", "serving_size": 1, "serving_unit": "piece", "calories": 300, "protein": 6.0, "carbs": 40.0, "fat": 13.0, "fiber": 3.5, "sugar": 1.0},
+    {"name": "Paratha roll (egg)", "serving_size": 1, "serving_unit": "piece", "calories": 350, "protein": 14.0, "carbs": 34.0, "fat": 18.0, "fiber": 2.5, "sugar": 1.5},
+    {"name": "Chana puri (plate)", "serving_size": 1, "serving_unit": "serving", "calories": 420, "protein": 12.0, "carbs": 55.0, "fat": 17.0, "fiber": 8.0, "sugar": 4.0},
+    {"name": "Sheermal", "serving_size": 1, "serving_unit": "piece", "calories": 280, "protein": 6.5, "carbs": 42.0, "fat": 9.5, "fiber": 1.5, "sugar": 6.0},
+    {"name": "Anda paratha", "serving_size": 1, "serving_unit": "piece", "calories": 320, "protein": 11.0, "carbs": 30.0, "fat": 18.0, "fiber": 2.5, "sugar": 1.0},
+    {"name": "Poha", "serving_size": 150, "serving_unit": "g", "calories": 250, "protein": 5.0, "carbs": 42.0, "fat": 7.0, "fiber": 3.0, "sugar": 3.0},
+    {"name": "Upma", "serving_size": 150, "serving_unit": "g", "calories": 220, "protein": 5.5, "carbs": 32.0, "fat": 8.0, "fiber": 2.5, "sugar": 1.5},
+
+    # ---- Drinks ----
+    {"name": "Doodh patti", "serving_size": 200, "serving_unit": "ml", "calories": 150, "protein": 4.5, "carbs": 14.0, "fat": 8.5, "fiber": 0.0, "sugar": 13.0},
+    {"name": "Sugarcane juice", "serving_size": 250, "serving_unit": "ml", "calories": 180, "protein": 0.0, "carbs": 45.0, "fat": 0.0, "fiber": 0.0, "sugar": 42.0},
+    {"name": "Rooh afza sharbat", "serving_size": 250, "serving_unit": "ml", "calories": 160, "protein": 0.0, "carbs": 40.0, "fat": 0.0, "fiber": 0.0, "sugar": 38.0},
+    {"name": "Lassi (salted)", "serving_size": 250, "serving_unit": "ml", "calories": 110, "protein": 5.0, "carbs": 9.0, "fat": 5.5, "fiber": 0.0, "sugar": 6.0},
+    {"name": "Falooda", "serving_size": 250, "serving_unit": "ml", "calories": 320, "protein": 5.0, "carbs": 55.0, "fat": 9.0, "fiber": 1.0, "sugar": 45.0},
+    {"name": "Green tea (plain)", "serving_size": 200, "serving_unit": "ml", "calories": 2, "protein": 0.0, "carbs": 0.5, "fat": 0.0, "fiber": 0.0, "sugar": 0.0},
+    {"name": "Kashmiri chai", "serving_size": 200, "serving_unit": "ml", "calories": 130, "protein": 3.0, "carbs": 14.0, "fat": 7.0, "fiber": 0.0, "sugar": 10.0},
+    {"name": "Sattu drink", "serving_size": 250, "serving_unit": "ml", "calories": 140, "protein": 6.0, "carbs": 22.0, "fat": 3.0, "fiber": 4.0, "sugar": 4.0},
+
+    # ---- BBQ / Grilled ----
+    {"name": "Seekh kebab", "serving_size": 1, "serving_unit": "piece", "calories": 150, "protein": 12.0, "carbs": 2.0, "fat": 10.0, "fiber": 0.3, "sugar": 0.3},
+    {"name": "Chicken tikka", "serving_size": 100, "serving_unit": "g", "calories": 190, "protein": 24.0, "carbs": 3.0, "fat": 9.0, "fiber": 0.3, "sugar": 1.5},
+    {"name": "Malai boti", "serving_size": 100, "serving_unit": "g", "calories": 240, "protein": 22.0, "carbs": 3.0, "fat": 16.0, "fiber": 0.2, "sugar": 1.0},
+    {"name": "Beef bihari kebab", "serving_size": 1, "serving_unit": "piece", "calories": 180, "protein": 14.0, "carbs": 3.0, "fat": 13.0, "fiber": 0.3, "sugar": 1.0},
+    {"name": "Chicken reshmi kebab", "serving_size": 1, "serving_unit": "piece", "calories": 160, "protein": 13.0, "carbs": 2.5, "fat": 11.0, "fiber": 0.2, "sugar": 1.0},
+    {"name": "Tandoori chicken (leg)", "serving_size": 1, "serving_unit": "piece", "calories": 210, "protein": 25.0, "carbs": 3.0, "fat": 11.0, "fiber": 0.3, "sugar": 1.5},
+    {"name": "Mutton chops (grilled)", "serving_size": 100, "serving_unit": "g", "calories": 280, "protein": 20.0, "carbs": 2.0, "fat": 21.0, "fiber": 0.1, "sugar": 0.5},
+    {"name": "Fish tikka", "serving_size": 100, "serving_unit": "g", "calories": 170, "protein": 22.0, "carbs": 3.0, "fat": 8.0, "fiber": 0.3, "sugar": 1.0},
+    # ---- Spices & Herbs (verified — ASEAN Food Composition Database, INMU/FAO) ----
+    {"name": "Garlic (fresh)", "serving_size": 100, "serving_unit": "g", "calories": 51, "protein": 2.1, "carbs": 10.4, "fat": 0.1, "fiber": 0, "sugar": 0},
+    {"name": "Ginger root (fresh)", "serving_size": 100, "serving_unit": "g", "calories": 39, "protein": 1.2, "carbs": 5.2, "fat": 0.8, "fiber": 2.9, "sugar": 0},
+    {"name": "Turmeric rhizome (fresh)", "serving_size": 100, "serving_unit": "g", "calories": 38, "protein": 1.1, "carbs": 4.4, "fat": 0.3, "fiber": 6.5, "sugar": 0},
+    {"name": "Coriander seed", "serving_size": 100, "serving_unit": "g", "calories": 327, "protein": 12.4, "carbs": 68.3, "fat": 0.5, "fiber": 0, "sugar": 0},
+    {"name": "Cumin seed", "serving_size": 100, "serving_unit": "g", "calories": 373, "protein": 14.3, "carbs": 55.1, "fat": 10.6, "fiber": 0, "sugar": 0},
+    {"name": "Coriander leaf (cilantro, fresh)", "serving_size": 100, "serving_unit": "g", "calories": 27, "protein": 2.5, "carbs": 2.2, "fat": 0.2, "fiber": 3.0, "sugar": 0},
+    {"name": "Mint leaf (fresh)", "serving_size": 100, "serving_unit": "g", "calories": 33, "protein": 2.9, "carbs": 1.4, "fat": 0.8, "fiber": 4.3, "sugar": 0},
+    {"name": "Holy basil leaf (fresh)", "serving_size": 100, "serving_unit": "g", "calories": 42, "protein": 3.3, "carbs": 4.0, "fat": 0.5, "fiber": 4.1, "sugar": 0},
+    {"name": "Sweet basil leaf (fresh)", "serving_size": 100, "serving_unit": "g", "calories": 36, "protein": 2.9, "carbs": 4.8, "fat": 0.1, "fiber": 2.0, "sugar": 0},
+    {"name": "Cinnamon (ground)", "serving_size": 100, "serving_unit": "g", "calories": 341, "protein": 3.3, "carbs": 78.0, "fat": 1.7, "fiber": 0, "sugar": 0},
+    {"name": "Galangal (fresh)", "serving_size": 100, "serving_unit": "g", "calories": 49, "protein": 0.9, "carbs": 10.2, "fat": 0.5, "fiber": 0, "sugar": 0},
+    {"name": "Lemongrass (fresh)", "serving_size": 100, "serving_unit": "g", "calories": 78, "protein": 0.8, "carbs": 16.5, "fat": 1.0, "fiber": 0, "sugar": 0},
+    {"name": "Shallot (bulb, fresh)", "serving_size": 100, "serving_unit": "g", "calories": 62, "protein": 1.7, "carbs": 12.3, "fat": 0.1, "fiber": 2.4, "sugar": 0},
+    {"name": "Black pepper (ground)", "serving_size": 100, "serving_unit": "g", "calories": 364, "protein": 12.4, "carbs": 62.2, "fat": 7.3, "fiber": 0, "sugar": 0},
+    {"name": "Bird's eye chilli (fresh)", "serving_size": 100, "serving_unit": "g", "calories": 56, "protein": 3.7, "carbs": 2.9, "fat": 1.1, "fiber": 9.9, "sugar": 0},
+    {"name": "Chickpea (dried, raw)", "serving_size": 100, "serving_unit": "g", "calories": 374, "protein": 19.8, "carbs": 62.1, "fat": 5.1, "fiber": 0, "sugar": 0},
 ]
 
 
 def seed_foods():
     db = SessionLocal()
     try:
-        existing_count = db.query(Food).count()
-        if existing_count > 0:
-            print(f"foods table mein pehle se {existing_count} rows hain. Seeding skip ki ja rahi hai.")
+        existing_names = {name for (name,) in db.query(Food.name).all()}
+
+        new_items = [item for item in FOODS_DATA if item["name"] not in existing_names]
+
+        if not new_items:
+            print("Koi naya food item nahi mila add karne ke liye. Sab pehle se maujood hain.")
             return
 
-        for item in FOODS_DATA:
+        for item in new_items:
             food = Food(**item)
             db.add(food)
 
         db.commit()
-        print(f"{len(FOODS_DATA)} foods successfully insert ho gaye.")
+        print(f"{len(new_items)} naye foods successfully insert ho gaye.")
     finally:
         db.close()
 

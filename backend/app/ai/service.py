@@ -71,7 +71,8 @@ def process_ai_extraction(db: Session, user_id, payload: AIExtractRequest) -> AI
     for item in extracted_items:
         food, score = find_best_matching_food(db, item.name)
 
-        is_confident = food is not None and score >= MATCH_CONFIDENCE_THRESHOLD
+        units_match = food is not None and item.unit.strip().lower() == food.serving_unit.strip().lower()
+        is_confident = food is not None and score >= MATCH_CONFIDENCE_THRESHOLD and units_match
 
         matched_items.append(
             MatchedItem(
