@@ -151,7 +151,7 @@ The design should feel similar to modern productivity applications rather than t
 
 | Purpose | Color |
 |---------|-------|
-| Primary | #22C55E |
+| Primary | #38a861 |
 | Secondary | #3B82F6 |
 | Success | #22C55E |
 | Warning | #F59E0B |

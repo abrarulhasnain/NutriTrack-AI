@@ -1,5 +1,6 @@
 from app.database import init_db
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 from app.core.config import settings
 from app.core.logging import logger, setup_logging
 from app.recipes.router import router as recipes_router
@@ -20,6 +21,13 @@ from app.reports.router import router as reports_router
 setup_logging()
 logger.info("Starting NutriTrack application")
 app = FastAPI(title=settings.app_name)
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:5173"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 # Register Routers
 app.include_router(users_router)
