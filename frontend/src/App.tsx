@@ -1,10 +1,14 @@
+import { AuthProvider } from './context/AuthProvider'
+
 function App() {
   return (
-    <div className="min-h-screen bg-slate-900 flex items-center justify-center">
-      <h1 className="text-4xl font-bold text-green-500">
-        NutriTrack AI — Tailwind Working! 🎉
-      </h1>
-    </div>
+    <AuthProvider>
+      <div className="min-h-screen bg-slate-900 flex items-center justify-center">
+        <h1 className="text-4xl font-bold text-green-500">
+          NutriTrack AI — Auth Ready
+        </h1>
+      </div>
+    </AuthProvider>
   )
 }
 
