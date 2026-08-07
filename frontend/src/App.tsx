@@ -5,6 +5,7 @@ import Login from './pages/auth/Login'
 import WaterTracker from './pages/water/WaterTracker'
 import Recipes from './pages/recipes/Recipes'
 import CustomFoods from './pages/customFoods/CustomFoods'
+import Reports from './pages/reports/Reports'
 
 function App() {
   return (
@@ -16,6 +17,7 @@ function App() {
           <Route path="/water" element={<WaterTracker />} />
           <Route path="/recipes" element={<Recipes />} />
           <Route path="/custom-foods" element={<CustomFoods />} />
+          <Route path="/reports" element={<Reports />} />
           <Route path="/" element={
             <div className="min-h-screen bg-slate-900 flex items-center justify-center">
               <h1 className="text-4xl font-bold text-green-500">
