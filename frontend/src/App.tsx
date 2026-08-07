@@ -3,6 +3,7 @@ import { AuthProvider } from './context/AuthProvider'
 import ProfileSetup from './pages/profile/ProfileSetup'
 import Login from './pages/auth/Login'
 import WaterTracker from './pages/water/WaterTracker'
+import Recipes from './pages/recipes/Recipes'
 
 function App() {
   return (
@@ -12,6 +13,7 @@ function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/profile-setup" element={<ProfileSetup />} />
           <Route path="/water" element={<WaterTracker />} />
+          <Route path="/recipes" element={<Recipes />} />
           <Route path="/" element={
             <div className="min-h-screen bg-slate-900 flex items-center justify-center">
               <h1 className="text-4xl font-bold text-green-500">
