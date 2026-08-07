@@ -1,12 +1,13 @@
 from uuid import UUID
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends
+from fastapi.responses import JSONResponse
 from sqlalchemy.orm import Session
 
 from app.auth.dependencies import get_current_user
 from app.database.session import get_db
 from app.users.models import User
-from app.utils.responses import success_response
+from app.utils.responses import success_response, error_response
 
 from app.recipes.schemas import (
     RecipeCreate,
@@ -28,17 +29,20 @@ router = APIRouter(
 )
 
 
-@router.post("/")
+@router.post("/", response_model=None)
 def create_recipe_endpoint(
     recipe_data: RecipeCreate,
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
 ):
-    recipe = create_new_recipe(
-        db=db,
-        recipe_data=recipe_data,
-        user_id=current_user.id,
-    )
+    try:
+        recipe = create_new_recipe(
+            db=db,
+            recipe_data=recipe_data,
+            user_id=current_user.id,
+        )
+    except ValueError as e:
+        return JSONResponse(status_code=400, content=error_response(message=str(e)))
 
     return success_response(
         message="Recipe created successfully",
@@ -46,7 +50,7 @@ def create_recipe_endpoint(
     )
 
 
-@router.get("/")
+@router.get("/", response_model=None)
 def get_recipes_endpoint(
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
@@ -65,7 +69,7 @@ def get_recipes_endpoint(
     )
 
 
-@router.get("/{recipe_id}")
+@router.get("/{recipe_id}", response_model=None)
 def get_recipe_by_id_endpoint(
     recipe_id: UUID,
     current_user: User = Depends(get_current_user),
@@ -78,10 +82,7 @@ def get_recipe_by_id_endpoint(
     )
 
     if recipe is None:
-        raise HTTPException(
-            status_code=404,
-            detail="Recipe not found",
-        )
+        return JSONResponse(status_code=404, content=error_response(message="Recipe not found"))
 
     return success_response(
         message="Recipe fetched successfully",
@@ -89,25 +90,25 @@ def get_recipe_by_id_endpoint(
     )
 
 
-@router.put("/{recipe_id}")
+@router.put("/{recipe_id}", response_model=None)
 def update_recipe_endpoint(
     recipe_id: UUID,
     recipe_data: RecipeUpdate,
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
 ):
-    recipe = update_existing_recipe(
-        db=db,
-        recipe_id=recipe_id,
-        recipe_data=recipe_data,
-        user_id=current_user.id,
-    )
+    try:
+        recipe = update_existing_recipe(
+            db=db,
+            recipe_id=recipe_id,
+            recipe_data=recipe_data,
+            user_id=current_user.id,
+        )
+    except ValueError as e:
+        return JSONResponse(status_code=400, content=error_response(message=str(e)))
 
     if recipe is None:
-        raise HTTPException(
-            status_code=404,
-            detail="Recipe not found",
-        )
+        return JSONResponse(status_code=404, content=error_response(message="Recipe not found"))
 
     return success_response(
         message="Recipe updated successfully",
@@ -115,7 +116,7 @@ def update_recipe_endpoint(
     )
 
 
-@router.delete("/{recipe_id}")
+@router.delete("/{recipe_id}", response_model=None)
 def delete_recipe_endpoint(
     recipe_id: UUID,
     current_user: User = Depends(get_current_user),
@@ -128,10 +129,7 @@ def delete_recipe_endpoint(
     )
 
     if not deleted:
-        raise HTTPException(
-            status_code=404,
-            detail="Recipe not found",
-        )
+        return JSONResponse(status_code=404, content=error_response(message="Recipe not found"))
 
     return success_response(
         message="Recipe deleted successfully",
