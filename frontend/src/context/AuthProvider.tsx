@@ -1,4 +1,4 @@
-import { useEffect, useState, type ReactNode } from 'react'
+﻿import { useEffect, useState, type ReactNode } from 'react'
 import { supabase } from '../api/supabaseClient'
 import { AuthContext, type AuthContextType } from './AuthContext'
 
@@ -7,13 +7,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    // Page load/refresh hone par, existing session check karo
+    // Check for an existing session on initial load or page refresh.
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session)
       setLoading(false)
     })
 
-    // Login/logout hone par session ko live update karo
+    // Keep the session in sync when the user logs in or out.
     const { data: listener } = supabase.auth.onAuthStateChange((_event, session) => {
       setSession(session)
     })

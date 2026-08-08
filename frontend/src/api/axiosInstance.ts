@@ -1,11 +1,11 @@
-import axios from 'axios'
+﻿import axios from 'axios'
 import { supabase } from './supabaseClient'
 
 const api = axios.create({
   baseURL: import.meta.env.VITE_API_BASE_URL,
 })
 
-// Har request se pehle, current session ka token nikaal ke header mein daal do
+// Attach the current session's access token to every outgoing request.
 api.interceptors.request.use(async (config) => {
   const { data: { session } } = await supabase.auth.getSession()
   if (session) {
