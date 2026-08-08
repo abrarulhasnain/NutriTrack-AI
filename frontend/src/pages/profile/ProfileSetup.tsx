@@ -1,11 +1,8 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
+import { UserCircle } from 'lucide-react'
 import api from '@/api/axiosInstance'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 
 export default function ProfileSetup() {
   const navigate = useNavigate()
@@ -96,10 +93,6 @@ export default function ProfileSetup() {
     }
   }
 
-  if (pageLoading) {
-    return <p className="text-center mt-10 text-muted-foreground">Loading...</p>
-  }
-
   const fields: { name: keyof typeof formData; label: string; type?: string }[] = [
     { name: 'full_name', label: 'Full Name' },
     { name: 'age', label: 'Age', type: 'number' },
@@ -115,43 +108,54 @@ export default function ProfileSetup() {
     { name: 'water_goal', label: 'Water Goal (ml)', type: 'number' },
   ]
 
+  const inputClass = "w-full rounded-full border border-gray-200 px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400 transition"
+
+  if (pageLoading) {
+    return <p className="text-center mt-10 text-gray-400">Loading...</p>
+  }
+
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.4 }}
-      className="max-w-md mx-auto mt-10 p-6"
-    >
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-2xl">
+    <div className="min-h-[80vh] flex items-center justify-center px-4 py-10">
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.4 }}
+        className="bg-white rounded-2xl shadow-xl p-8 w-full max-w-md"
+      >
+        <div className="flex items-center gap-3 mb-6">
+          <div className="w-12 h-12 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center">
+            <UserCircle className="text-white" size={22} />
+          </div>
+          <h1 className="text-xl font-bold text-gray-800">
             {isEditing ? 'Edit Your Profile' : 'Complete Your Profile'}
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-3">
-            {fields.map((field) => (
-              <div key={field.name} className="space-y-1">
-                <Label htmlFor={field.name}>{field.label}</Label>
-                <Input
-                  id={field.name}
-                  name={field.name}
-                  type={field.type || 'text'}
-                  value={formData[field.name]}
-                  onChange={handleChange}
-                  required
-                />
-              </div>
-            ))}
+          </h1>
+        </div>
 
-            {error && <p className="text-red-500 text-sm">{error}</p>}
+        <form onSubmit={handleSubmit} className="space-y-3">
+          {fields.map((field) => (
+            <input
+              key={field.name}
+              name={field.name}
+              type={field.type || 'text'}
+              placeholder={field.label}
+              value={formData[field.name]}
+              onChange={handleChange}
+              className={inputClass}
+              required
+            />
+          ))}
 
-            <Button type="submit" disabled={loading} className="w-full mt-2">
-              {loading ? 'Saving...' : isEditing ? 'Update Profile' : 'Save Profile'}
-            </Button>
-          </form>
-        </CardContent>
-      </Card>
-    </motion.div>
+          {error && <p className="text-red-500 text-sm">{error}</p>}
+
+          <button
+            type="submit"
+            disabled={loading}
+            className="w-full rounded-full bg-gradient-to-r from-indigo-500 to-purple-600 text-white font-semibold py-2.5 shadow-md hover:opacity-90 transition disabled:opacity-50 mt-2"
+          >
+            {loading ? 'Saving...' : isEditing ? 'Update Profile' : 'Save Profile'}
+          </button>
+        </form>
+      </motion.div>
+    </div>
   )
 }
