@@ -1,5 +1,10 @@
 import { useState, useEffect } from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
 import api from '@/api/axiosInstance'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 
 interface RecipeItem {
   food_id: string
@@ -26,6 +31,7 @@ export default function Recipes() {
   const [items, setItems] = useState<RecipeItem[]>([{ food_id: '', quantity: 0, unit: 'g' }])
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
+  const [fetching, setFetching] = useState(true)
 
   async function fetchRecipes() {
     try {
@@ -33,6 +39,8 @@ export default function Recipes() {
       setRecipes(response.data.data)
     } catch (err) {
       console.error(err)
+    } finally {
+      setFetching(false)
     }
   }
 
@@ -70,12 +78,9 @@ export default function Recipes() {
       })),
     }
 
-    console.log('Sending this data:', payload)
-
     try {
       await api.post('/recipes/', payload)
 
-      // Reset form
       setName('')
       setDescription('')
       setServings(1)
@@ -100,101 +105,120 @@ export default function Recipes() {
   }
 
   return (
-    <div className="max-w-2xl mx-auto mt-10 p-6">
-      <h1 className="text-2xl font-bold mb-6">My Recipes</h1>
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.4 }}
+      className="max-w-2xl mx-auto mt-10 p-6 space-y-8"
+    >
+      <h1 className="text-2xl font-bold">My Recipes</h1>
 
-      {/* Create Recipe Form */}
-      <form onSubmit={handleSubmit} className="space-y-3 mb-10 border p-4 rounded">
-        <h2 className="text-lg font-semibold">Create New Recipe</h2>
-
-        <input
-          placeholder="Recipe Name"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          className="w-full border p-2 rounded"
-          required
-        />
-        <input
-          placeholder="Description"
-          value={description}
-          onChange={(e) => setDescription(e.target.value)}
-          className="w-full border p-2 rounded"
-        />
-        <input
-          type="number"
-          placeholder="Servings"
-          value={servings}
-          onChange={(e) => setServings(Number(e.target.value))}
-          className="w-full border p-2 rounded"
-          required
-        />
-
-        <div>
-          <p className="text-sm font-medium mb-2">Ingredients</p>
-          {items.map((item, index) => (
-            <div key={index} className="flex gap-2 mb-2">
-              <input
-                placeholder="Food ID"
-                value={item.food_id}
-                onChange={(e) => updateItem(index, 'food_id', e.target.value)}
-                className="flex-1 border p-2 rounded text-sm"
-                required
-              />
-              <input
-                type="number"
-                placeholder="Qty"
-                value={item.quantity}
-                onChange={(e) => updateItem(index, 'quantity', e.target.value)}
-                className="w-20 border p-2 rounded text-sm"
-                required
-              />
-              <input
-                placeholder="Unit"
-                value={item.unit}
-                onChange={(e) => updateItem(index, 'unit', e.target.value)}
-                className="w-16 border p-2 rounded text-sm"
-                required
-              />
-              {items.length > 1 && (
-                <button type="button" onClick={() => removeItemRow(index)} className="text-red-500 px-2">
-                  ✕
-                </button>
-              )}
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-lg">Create New Recipe</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div className="space-y-1">
+              <Label htmlFor="recipe-name">Recipe Name</Label>
+              <Input id="recipe-name" placeholder="e.g. Chicken Biryani Bowl" value={name} onChange={(e) => setName(e.target.value)} required />
             </div>
-          ))}
-          <button type="button" onClick={addItemRow} className="text-blue-600 text-sm">
-            + Add Ingredient
-          </button>
-        </div>
 
-        {error && <p className="text-red-500 text-sm">{error}</p>}
+            <div className="space-y-1">
+              <Label htmlFor="recipe-description">Description</Label>
+              <Input id="recipe-description" placeholder="Optional" value={description} onChange={(e) => setDescription(e.target.value)} />
+            </div>
 
-        <button type="submit" disabled={loading} className="w-full bg-blue-600 text-white p-2 rounded">
-          {loading ? 'Creating...' : 'Create Recipe'}
-        </button>
-      </form>
+            <div className="space-y-1">
+              <Label htmlFor="recipe-servings">Servings</Label>
+              <Input id="recipe-servings" type="number" value={servings} onChange={(e) => setServings(Number(e.target.value))} required />
+            </div>
 
-      {/* Recipes List */}
+            <div>
+              <Label className="mb-2 block">Ingredients</Label>
+              <div className="space-y-2">
+                {items.map((item, index) => (
+                  <div key={index} className="flex gap-2">
+                    <Input
+                      placeholder="Food ID"
+                      value={item.food_id}
+                      onChange={(e) => updateItem(index, 'food_id', e.target.value)}
+                      className="flex-1 text-sm"
+                      required
+                    />
+                    <Input
+                      type="number"
+                      placeholder="Qty"
+                      value={item.quantity}
+                      onChange={(e) => updateItem(index, 'quantity', e.target.value)}
+                      className="w-20 text-sm"
+                      required
+                    />
+                    <Input
+                      placeholder="Unit"
+                      value={item.unit}
+                      onChange={(e) => updateItem(index, 'unit', e.target.value)}
+                      className="w-16 text-sm"
+                      required
+                    />
+                    {items.length > 1 && (
+                      <Button type="button" variant="ghost" size="sm" onClick={() => removeItemRow(index)} className="text-red-500">
+                        ✕
+                      </Button>
+                    )}
+                  </div>
+                ))}
+              </div>
+              <Button type="button" variant="link" onClick={addItemRow} className="px-0 mt-1">
+                + Add Ingredient
+              </Button>
+            </div>
+
+            {error && <p className="text-red-500 text-sm">{error}</p>}
+
+            <Button type="submit" disabled={loading} className="w-full">
+              {loading ? 'Creating...' : 'Create Recipe'}
+            </Button>
+          </form>
+        </CardContent>
+      </Card>
+
       <div className="space-y-3">
         <h2 className="text-lg font-semibold">Saved Recipes</h2>
-        {recipes.length === 0 && <p className="text-gray-500 text-sm">No recipes yet.</p>}
 
-        {recipes.map((recipe) => (
-          <div key={recipe.id} className="border p-4 rounded flex justify-between items-start">
-            <div>
-              <h3 className="font-bold">{recipe.name}</h3>
-              <p className="text-sm text-gray-600">{recipe.description}</p>
-              <p className="text-sm mt-1">
-                {recipe.total_calories} cal | {recipe.total_protein}g protein | {recipe.total_carbs}g carbs | {recipe.total_fat}g fat
-              </p>
-              <p className="text-xs text-gray-400">Servings: {recipe.servings}</p>
-            </div>
-            <button onClick={() => handleDelete(recipe.id)} className="text-red-500 text-sm">
-              Delete
-            </button>
-          </div>
-        ))}
+        {fetching && <p className="text-muted-foreground text-sm">Loading...</p>}
+        {!fetching && recipes.length === 0 && (
+          <p className="text-muted-foreground text-sm">No recipes yet. Create your first one above!</p>
+        )}
+
+        <AnimatePresence>
+          {recipes.map((recipe, index) => (
+            <motion.div
+              key={recipe.id}
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, x: -20 }}
+              transition={{ duration: 0.3, delay: index * 0.05 }}
+            >
+              <Card>
+                <CardContent className="flex justify-between items-start p-4">
+                  <div>
+                    <h3 className="font-bold">{recipe.name}</h3>
+                    <p className="text-sm text-muted-foreground">{recipe.description}</p>
+                    <p className="text-sm mt-1">
+                      {recipe.total_calories} cal | {recipe.total_protein}g protein | {recipe.total_carbs}g carbs | {recipe.total_fat}g fat
+                    </p>
+                    <p className="text-xs text-muted-foreground">Servings: {recipe.servings}</p>
+                  </div>
+                  <Button variant="ghost" size="sm" onClick={() => handleDelete(recipe.id)} className="text-red-500">
+                    Delete
+                  </Button>
+                </CardContent>
+              </Card>
+            </motion.div>
+          ))}
+        </AnimatePresence>
       </div>
-    </div>
+    </motion.div>
   )
 }

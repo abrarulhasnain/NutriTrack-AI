@@ -1,7 +1,15 @@
 import { useState, useEffect } from 'react'
+import { useNavigate } from 'react-router-dom'
+import { motion } from 'framer-motion'
 import api from '@/api/axiosInstance'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 
 export default function ProfileSetup() {
+  const navigate = useNavigate()
+
   const [formData, setFormData] = useState({
     full_name: '',
     age: '',
@@ -42,7 +50,6 @@ export default function ProfileSetup() {
       })
       setIsEditing(true)
     } catch (err) {
-      // Profile doesn't exist yet — that's fine, keep the form empty
       setIsEditing(false)
     } finally {
       setPageLoading(false)
@@ -80,7 +87,7 @@ export default function ProfileSetup() {
       } else {
         await api.post('/profiles/', payload)
       }
-      window.location.href = '/'
+      navigate('/dashboard')
     } catch (err) {
       setError('Something went wrong while saving your profile. Please try again.')
       console.error(err)
@@ -90,35 +97,61 @@ export default function ProfileSetup() {
   }
 
   if (pageLoading) {
-    return <p className="text-center mt-10">Loading...</p>
+    return <p className="text-center mt-10 text-muted-foreground">Loading...</p>
   }
 
+  const fields: { name: keyof typeof formData; label: string; type?: string }[] = [
+    { name: 'full_name', label: 'Full Name' },
+    { name: 'age', label: 'Age', type: 'number' },
+    { name: 'gender', label: 'Gender' },
+    { name: 'height_cm', label: 'Height (cm)', type: 'number' },
+    { name: 'weight_kg', label: 'Weight (kg)', type: 'number' },
+    { name: 'activity_level', label: 'Activity Level' },
+    { name: 'fitness_goal', label: 'Fitness Goal' },
+    { name: 'calorie_goal', label: 'Calorie Goal', type: 'number' },
+    { name: 'protein_goal', label: 'Protein Goal (g)', type: 'number' },
+    { name: 'carbs_goal', label: 'Carbs Goal (g)', type: 'number' },
+    { name: 'fat_goal', label: 'Fat Goal (g)', type: 'number' },
+    { name: 'water_goal', label: 'Water Goal (ml)', type: 'number' },
+  ]
+
   return (
-    <div className="max-w-md mx-auto mt-10 p-6">
-      <h1 className="text-2xl font-bold mb-4">
-        {isEditing ? 'Edit Your Profile' : 'Complete Your Profile'}
-      </h1>
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.4 }}
+      className="max-w-md mx-auto mt-10 p-6"
+    >
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-2xl">
+            {isEditing ? 'Edit Your Profile' : 'Complete Your Profile'}
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <form onSubmit={handleSubmit} className="space-y-3">
+            {fields.map((field) => (
+              <div key={field.name} className="space-y-1">
+                <Label htmlFor={field.name}>{field.label}</Label>
+                <Input
+                  id={field.name}
+                  name={field.name}
+                  type={field.type || 'text'}
+                  value={formData[field.name]}
+                  onChange={handleChange}
+                  required
+                />
+              </div>
+            ))}
 
-      <form onSubmit={handleSubmit} className="space-y-3">
-        <input name="full_name" placeholder="Full Name" value={formData.full_name} onChange={handleChange} className="w-full border p-2 rounded" required />
-        <input name="age" type="number" placeholder="Age" value={formData.age} onChange={handleChange} className="w-full border p-2 rounded" required />
-        <input name="gender" placeholder="Gender" value={formData.gender} onChange={handleChange} className="w-full border p-2 rounded" required />
-        <input name="height_cm" type="number" placeholder="Height (cm)" value={formData.height_cm} onChange={handleChange} className="w-full border p-2 rounded" required />
-        <input name="weight_kg" type="number" placeholder="Weight (kg)" value={formData.weight_kg} onChange={handleChange} className="w-full border p-2 rounded" required />
-        <input name="activity_level" placeholder="Activity Level" value={formData.activity_level} onChange={handleChange} className="w-full border p-2 rounded" required />
-        <input name="fitness_goal" placeholder="Fitness Goal" value={formData.fitness_goal} onChange={handleChange} className="w-full border p-2 rounded" required />
-        <input name="calorie_goal" type="number" placeholder="Calorie Goal" value={formData.calorie_goal} onChange={handleChange} className="w-full border p-2 rounded" required />
-        <input name="protein_goal" type="number" placeholder="Protein Goal" value={formData.protein_goal} onChange={handleChange} className="w-full border p-2 rounded" required />
-        <input name="carbs_goal" type="number" placeholder="Carbs Goal" value={formData.carbs_goal} onChange={handleChange} className="w-full border p-2 rounded" required />
-        <input name="fat_goal" type="number" placeholder="Fat Goal" value={formData.fat_goal} onChange={handleChange} className="w-full border p-2 rounded" required />
-        <input name="water_goal" type="number" placeholder="Water Goal (ml)" value={formData.water_goal} onChange={handleChange} className="w-full border p-2 rounded" required />
+            {error && <p className="text-red-500 text-sm">{error}</p>}
 
-        {error && <p className="text-red-500 text-sm">{error}</p>}
-
-        <button type="submit" disabled={loading} className="w-full bg-blue-600 text-white p-2 rounded">
-          {loading ? 'Saving...' : isEditing ? 'Update Profile' : 'Save Profile'}
-        </button>
-      </form>
-    </div>
+            <Button type="submit" disabled={loading} className="w-full mt-2">
+              {loading ? 'Saving...' : isEditing ? 'Update Profile' : 'Save Profile'}
+            </Button>
+          </form>
+        </CardContent>
+      </Card>
+    </motion.div>
   )
 }
