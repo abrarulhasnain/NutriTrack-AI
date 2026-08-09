@@ -1,4 +1,6 @@
 import { useState, useEffect } from 'react'
+import { motion } from 'framer-motion'
+import { Droplet } from 'lucide-react'
 import api from '@/api/axiosInstance'
 
 export default function WaterTracker() {
@@ -6,7 +8,7 @@ export default function WaterTracker() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
 
-  const today = new Date().toISOString().split('T')[0] // "2026-08-06" format
+  const today = new Date().toISOString().split('T')[0]
 
   async function fetchTotal() {
     try {
@@ -42,30 +44,49 @@ export default function WaterTracker() {
   }, [])
 
   return (
-    <div className="max-w-md mx-auto mt-10 p-6 text-center">
-      <h1 className="text-2xl font-bold mb-4">Water Tracker</h1>
+    <div className="min-h-[80vh] flex items-center justify-center px-4">
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.4 }}
+        className="bg-white rounded-2xl shadow-xl p-8 w-full max-w-sm text-center"
+      >
+        <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center">
+          <Droplet className="text-white" size={28} />
+        </div>
 
-      <p className="text-4xl font-bold text-blue-600 mb-6">{total} ml</p>
-      <p className="text-sm text-gray-500 mb-6">Today's total intake</p>
+        <h1 className="text-xl font-bold text-gray-800 mb-1">Water Tracker</h1>
+        <p className="text-sm text-gray-400 mb-6">Today's total intake</p>
 
-      <div className="flex gap-3 justify-center">
-        <button
-          onClick={() => addWater(250)}
-          disabled={loading}
-          className="bg-blue-500 text-white px-4 py-2 rounded"
+        <motion.p
+          key={total}
+          initial={{ scale: 0.8, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          transition={{ duration: 0.3 }}
+          className="text-5xl font-extrabold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent mb-8"
         >
-          +250 ml
-        </button>
-        <button
-          onClick={() => addWater(500)}
-          disabled={loading}
-          className="bg-blue-600 text-white px-4 py-2 rounded"
-        >
-          +500 ml
-        </button>
-      </div>
+          {total} ml
+        </motion.p>
 
-      {error && <p className="text-red-500 text-sm mt-4">{error}</p>}
+        <div className="flex gap-3 justify-center">
+          <button
+            onClick={() => addWater(250)}
+            disabled={loading}
+            className="flex-1 rounded-full bg-gradient-to-r from-indigo-500 to-purple-600 text-white font-semibold py-2.5 shadow-md hover:opacity-90 transition disabled:opacity-50"
+          >
+            +250 ml
+          </button>
+          <button
+            onClick={() => addWater(500)}
+            disabled={loading}
+            className="flex-1 rounded-full border-2 border-indigo-500 text-indigo-600 font-semibold py-2.5 hover:bg-indigo-50 transition disabled:opacity-50"
+          >
+            +500 ml
+          </button>
+        </div>
+
+        {error && <p className="text-red-500 text-sm mt-4">{error}</p>}
+      </motion.div>
     </div>
   )
 }

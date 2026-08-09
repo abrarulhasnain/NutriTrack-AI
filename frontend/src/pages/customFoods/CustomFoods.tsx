@@ -1,4 +1,6 @@
 import { useState, useEffect } from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
+import { Apple, Trash2 } from 'lucide-react'
 import api from '@/api/axiosInstance'
 
 interface CustomFood {
@@ -17,18 +19,12 @@ interface CustomFood {
 export default function CustomFoods() {
   const [foods, setFoods] = useState<CustomFood[]>([])
   const [formData, setFormData] = useState({
-    name: '',
-    serving_size: '',
-    serving_unit: '',
-    calories: '',
-    protein: '',
-    carbs: '',
-    fat: '',
-    fiber: '',
-    sugar: '',
+    name: '', serving_size: '', serving_unit: '', calories: '',
+    protein: '', carbs: '', fat: '', fiber: '', sugar: '',
   })
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
+  const [fetching, setFetching] = useState(true)
 
   async function fetchFoods() {
     try {
@@ -36,6 +32,8 @@ export default function CustomFoods() {
       setFoods(response.data.data)
     } catch (err) {
       console.error(err)
+    } finally {
+      setFetching(false)
     }
   }
 
@@ -66,15 +64,8 @@ export default function CustomFoods() {
       })
 
       setFormData({
-        name: '',
-        serving_size: '',
-        serving_unit: '',
-        calories: '',
-        protein: '',
-        carbs: '',
-        fat: '',
-        fiber: '',
-        sugar: '',
+        name: '', serving_size: '', serving_unit: '', calories: '',
+        protein: '', carbs: '', fat: '', fiber: '', sugar: '',
       })
 
       await fetchFoods()
@@ -95,54 +86,89 @@ export default function CustomFoods() {
     }
   }
 
+  const inputClass = "w-full rounded-full border border-gray-200 px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400 transition"
+
   return (
-    <div className="max-w-2xl mx-auto mt-10 p-6">
-      <h1 className="text-2xl font-bold mb-6">My Custom Foods</h1>
-
-      <form onSubmit={handleSubmit} className="space-y-3 mb-10 border p-4 rounded">
-        <h2 className="text-lg font-semibold">Add Custom Food</h2>
-
-        <input name="name" placeholder="Food Name" value={formData.name} onChange={handleChange} className="w-full border p-2 rounded" required />
-
-        <div className="flex gap-2">
-          <input name="serving_size" type="number" placeholder="Serving Size" value={formData.serving_size} onChange={handleChange} className="flex-1 border p-2 rounded" required />
-          <input name="serving_unit" placeholder="Unit (g, ml, piece)" value={formData.serving_unit} onChange={handleChange} className="flex-1 border p-2 rounded" required />
+    <div className="max-w-2xl mx-auto mt-10 px-4 space-y-8">
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.4 }}
+        className="flex items-center gap-3"
+      >
+        <div className="w-12 h-12 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center">
+          <Apple className="text-white" size={22} />
         </div>
+        <h1 className="text-2xl font-bold text-gray-800">My Custom Foods</h1>
+      </motion.div>
 
-        <div className="grid grid-cols-2 gap-2">
-          <input name="calories" type="number" placeholder="Calories" value={formData.calories} onChange={handleChange} className="border p-2 rounded" required />
-          <input name="protein" type="number" placeholder="Protein (g)" value={formData.protein} onChange={handleChange} className="border p-2 rounded" required />
-          <input name="carbs" type="number" placeholder="Carbs (g)" value={formData.carbs} onChange={handleChange} className="border p-2 rounded" required />
-          <input name="fat" type="number" placeholder="Fat (g)" value={formData.fat} onChange={handleChange} className="border p-2 rounded" required />
-          <input name="fiber" type="number" placeholder="Fiber (g)" value={formData.fiber} onChange={handleChange} className="border p-2 rounded" required />
-          <input name="sugar" type="number" placeholder="Sugar (g)" value={formData.sugar} onChange={handleChange} className="border p-2 rounded" required />
-        </div>
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.4, delay: 0.1 }}
+        className="bg-white rounded-2xl shadow-lg p-6"
+      >
+        <h2 className="text-lg font-semibold text-gray-800 mb-4">Add Custom Food</h2>
+        <form onSubmit={handleSubmit} className="space-y-3">
+          <input name="name" placeholder="Food Name" value={formData.name} onChange={handleChange} className={inputClass} required />
 
-        {error && <p className="text-red-500 text-sm">{error}</p>}
-
-        <button type="submit" disabled={loading} className="w-full bg-blue-600 text-white p-2 rounded">
-          {loading ? 'Saving...' : 'Add Custom Food'}
-        </button>
-      </form>
-
-      <div className="space-y-3">
-        <h2 className="text-lg font-semibold">Saved Custom Foods</h2>
-        {foods.length === 0 && <p className="text-gray-500 text-sm">No custom foods yet.</p>}
-
-        {foods.map((food) => (
-          <div key={food.id} className="border p-4 rounded flex justify-between items-start">
-            <div>
-              <h3 className="font-bold">{food.name}</h3>
-              <p className="text-xs text-gray-400">Per {food.serving_size}{food.serving_unit}</p>
-              <p className="text-sm mt-1">
-                {food.calories} cal | {food.protein}g protein | {food.carbs}g carbs | {food.fat}g fat
-              </p>
-            </div>
-            <button onClick={() => handleDelete(food.id)} className="text-red-500 text-sm">
-              Delete
-            </button>
+          <div className="flex gap-2">
+            <input name="serving_size" type="number" placeholder="Serving Size" value={formData.serving_size} onChange={handleChange} className={inputClass} required />
+            <input name="serving_unit" placeholder="Unit (g, ml, piece)" value={formData.serving_unit} onChange={handleChange} className={inputClass} required />
           </div>
-        ))}
+
+          <div className="grid grid-cols-3 gap-2">
+            <input name="calories" type="number" placeholder="Calories" value={formData.calories} onChange={handleChange} className={inputClass} required />
+            <input name="protein" type="number" placeholder="Protein" value={formData.protein} onChange={handleChange} className={inputClass} required />
+            <input name="carbs" type="number" placeholder="Carbs" value={formData.carbs} onChange={handleChange} className={inputClass} required />
+            <input name="fat" type="number" placeholder="Fat" value={formData.fat} onChange={handleChange} className={inputClass} required />
+            <input name="fiber" type="number" placeholder="Fiber" value={formData.fiber} onChange={handleChange} className={inputClass} required />
+            <input name="sugar" type="number" placeholder="Sugar" value={formData.sugar} onChange={handleChange} className={inputClass} required />
+          </div>
+
+          {error && <p className="text-red-500 text-sm">{error}</p>}
+
+          <button
+            type="submit"
+            disabled={loading}
+            className="w-full rounded-full bg-gradient-to-r from-indigo-500 to-purple-600 text-white font-semibold py-2.5 shadow-md hover:opacity-90 transition disabled:opacity-50"
+          >
+            {loading ? 'Saving...' : 'Add Custom Food'}
+          </button>
+        </form>
+      </motion.div>
+
+      <div className="space-y-3 pb-10">
+        <h2 className="text-lg font-semibold text-gray-800">Saved Custom Foods</h2>
+
+        {fetching && <p className="text-gray-400 text-sm">Loading...</p>}
+        {!fetching && foods.length === 0 && (
+          <p className="text-gray-400 text-sm">No custom foods yet. Add your first one above!</p>
+        )}
+
+        <AnimatePresence>
+          {foods.map((food, index) => (
+            <motion.div
+              key={food.id}
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, x: -20 }}
+              transition={{ duration: 0.3, delay: index * 0.05 }}
+              className="bg-white rounded-2xl shadow-md p-4 flex justify-between items-start"
+            >
+              <div>
+                <h3 className="font-bold text-gray-800">{food.name}</h3>
+                <p className="text-xs text-gray-400">Per {food.serving_size}{food.serving_unit}</p>
+                <p className="text-sm mt-1 text-gray-600">
+                  {food.calories} cal | {food.protein}g protein | {food.carbs}g carbs | {food.fat}g fat
+                </p>
+              </div>
+              <button onClick={() => handleDelete(food.id)} className="text-gray-400 hover:text-red-500 transition p-1">
+                <Trash2 size={18} />
+              </button>
+            </motion.div>
+          ))}
+        </AnimatePresence>
       </div>
     </div>
   )

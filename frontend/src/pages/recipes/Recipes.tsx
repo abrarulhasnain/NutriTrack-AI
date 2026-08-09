@@ -1,4 +1,6 @@
 import { useState, useEffect } from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
+import { ChefHat, Trash2, X } from 'lucide-react'
 import api from '@/api/axiosInstance'
 
 interface RecipeItem {
@@ -26,6 +28,7 @@ export default function Recipes() {
   const [items, setItems] = useState<RecipeItem[]>([{ food_id: '', quantity: 0, unit: 'g' }])
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
+  const [fetching, setFetching] = useState(true)
 
   async function fetchRecipes() {
     try {
@@ -33,6 +36,8 @@ export default function Recipes() {
       setRecipes(response.data.data)
     } catch (err) {
       console.error(err)
+    } finally {
+      setFetching(false)
     }
   }
 
@@ -70,12 +75,9 @@ export default function Recipes() {
       })),
     }
 
-    console.log('Sending this data:', payload)
-
     try {
       await api.post('/recipes/', payload)
 
-      // Reset form
       setName('')
       setDescription('')
       setServings(1)
@@ -99,101 +101,118 @@ export default function Recipes() {
     }
   }
 
+  const inputClass = "w-full rounded-full border border-gray-200 px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400 transition"
+
   return (
-    <div className="max-w-2xl mx-auto mt-10 p-6">
-      <h1 className="text-2xl font-bold mb-6">My Recipes</h1>
-
-      {/* Create Recipe Form */}
-      <form onSubmit={handleSubmit} className="space-y-3 mb-10 border p-4 rounded">
-        <h2 className="text-lg font-semibold">Create New Recipe</h2>
-
-        <input
-          placeholder="Recipe Name"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          className="w-full border p-2 rounded"
-          required
-        />
-        <input
-          placeholder="Description"
-          value={description}
-          onChange={(e) => setDescription(e.target.value)}
-          className="w-full border p-2 rounded"
-        />
-        <input
-          type="number"
-          placeholder="Servings"
-          value={servings}
-          onChange={(e) => setServings(Number(e.target.value))}
-          className="w-full border p-2 rounded"
-          required
-        />
-
-        <div>
-          <p className="text-sm font-medium mb-2">Ingredients</p>
-          {items.map((item, index) => (
-            <div key={index} className="flex gap-2 mb-2">
-              <input
-                placeholder="Food ID"
-                value={item.food_id}
-                onChange={(e) => updateItem(index, 'food_id', e.target.value)}
-                className="flex-1 border p-2 rounded text-sm"
-                required
-              />
-              <input
-                type="number"
-                placeholder="Qty"
-                value={item.quantity}
-                onChange={(e) => updateItem(index, 'quantity', e.target.value)}
-                className="w-20 border p-2 rounded text-sm"
-                required
-              />
-              <input
-                placeholder="Unit"
-                value={item.unit}
-                onChange={(e) => updateItem(index, 'unit', e.target.value)}
-                className="w-16 border p-2 rounded text-sm"
-                required
-              />
-              {items.length > 1 && (
-                <button type="button" onClick={() => removeItemRow(index)} className="text-red-500 px-2">
-                  ✕
-                </button>
-              )}
-            </div>
-          ))}
-          <button type="button" onClick={addItemRow} className="text-blue-600 text-sm">
-            + Add Ingredient
-          </button>
+    <div className="max-w-2xl mx-auto mt-10 px-4 space-y-8">
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.4 }}
+        className="flex items-center gap-3"
+      >
+        <div className="w-12 h-12 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center">
+          <ChefHat className="text-white" size={22} />
         </div>
+        <h1 className="text-2xl font-bold text-gray-800">My Recipes</h1>
+      </motion.div>
 
-        {error && <p className="text-red-500 text-sm">{error}</p>}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.4, delay: 0.1 }}
+        className="bg-white rounded-2xl shadow-lg p-6"
+      >
+        <h2 className="text-lg font-semibold text-gray-800 mb-4">Create New Recipe</h2>
+        <form onSubmit={handleSubmit} className="space-y-3">
+          <input placeholder="Recipe Name" value={name} onChange={(e) => setName(e.target.value)} className={inputClass} required />
+          <input placeholder="Description (optional)" value={description} onChange={(e) => setDescription(e.target.value)} className={inputClass} />
+          <input type="number" placeholder="Servings" value={servings} onChange={(e) => setServings(Number(e.target.value))} className={inputClass} required />
 
-        <button type="submit" disabled={loading} className="w-full bg-blue-600 text-white p-2 rounded">
-          {loading ? 'Creating...' : 'Create Recipe'}
-        </button>
-      </form>
-
-      {/* Recipes List */}
-      <div className="space-y-3">
-        <h2 className="text-lg font-semibold">Saved Recipes</h2>
-        {recipes.length === 0 && <p className="text-gray-500 text-sm">No recipes yet.</p>}
-
-        {recipes.map((recipe) => (
-          <div key={recipe.id} className="border p-4 rounded flex justify-between items-start">
-            <div>
-              <h3 className="font-bold">{recipe.name}</h3>
-              <p className="text-sm text-gray-600">{recipe.description}</p>
-              <p className="text-sm mt-1">
-                {recipe.total_calories} cal | {recipe.total_protein}g protein | {recipe.total_carbs}g carbs | {recipe.total_fat}g fat
-              </p>
-              <p className="text-xs text-gray-400">Servings: {recipe.servings}</p>
+          <div>
+            <p className="text-sm font-medium text-gray-600 mb-2 px-1">Ingredients</p>
+            <div className="space-y-2">
+              {items.map((item, index) => (
+                <div key={index} className="flex gap-2 items-center">
+                  <input
+                    placeholder="Food ID"
+                    value={item.food_id}
+                    onChange={(e) => updateItem(index, 'food_id', e.target.value)}
+                    className={`${inputClass} flex-1`}
+                    required
+                  />
+                  <input
+                    type="number"
+                    placeholder="Qty"
+                    value={item.quantity}
+                    onChange={(e) => updateItem(index, 'quantity', e.target.value)}
+                    className={`${inputClass} w-20`}
+                    required
+                  />
+                  <input
+                    placeholder="Unit"
+                    value={item.unit}
+                    onChange={(e) => updateItem(index, 'unit', e.target.value)}
+                    className={`${inputClass} w-16`}
+                    required
+                  />
+                  {items.length > 1 && (
+                    <button type="button" onClick={() => removeItemRow(index)} className="text-gray-400 hover:text-red-500 transition p-1">
+                      <X size={18} />
+                    </button>
+                  )}
+                </div>
+              ))}
             </div>
-            <button onClick={() => handleDelete(recipe.id)} className="text-red-500 text-sm">
-              Delete
+            <button type="button" onClick={addItemRow} className="text-indigo-600 text-sm font-medium mt-2 px-1 hover:underline">
+              + Add Ingredient
             </button>
           </div>
-        ))}
+
+          {error && <p className="text-red-500 text-sm">{error}</p>}
+
+          <button
+            type="submit"
+            disabled={loading}
+            className="w-full rounded-full bg-gradient-to-r from-indigo-500 to-purple-600 text-white font-semibold py-2.5 shadow-md hover:opacity-90 transition disabled:opacity-50"
+          >
+            {loading ? 'Creating...' : 'Create Recipe'}
+          </button>
+        </form>
+      </motion.div>
+
+      <div className="space-y-3 pb-10">
+        <h2 className="text-lg font-semibold text-gray-800">Saved Recipes</h2>
+
+        {fetching && <p className="text-gray-400 text-sm">Loading...</p>}
+        {!fetching && recipes.length === 0 && (
+          <p className="text-gray-400 text-sm">No recipes yet. Create your first one above!</p>
+        )}
+
+        <AnimatePresence>
+          {recipes.map((recipe, index) => (
+            <motion.div
+              key={recipe.id}
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, x: -20 }}
+              transition={{ duration: 0.3, delay: index * 0.05 }}
+              className="bg-white rounded-2xl shadow-md p-4 flex justify-between items-start"
+            >
+              <div>
+                <h3 className="font-bold text-gray-800">{recipe.name}</h3>
+                <p className="text-sm text-gray-500">{recipe.description}</p>
+                <p className="text-sm mt-1 text-gray-600">
+                  {recipe.total_calories} cal | {recipe.total_protein}g protein | {recipe.total_carbs}g carbs | {recipe.total_fat}g fat
+                </p>
+                <p className="text-xs text-gray-400">Servings: {recipe.servings}</p>
+              </div>
+              <button onClick={() => handleDelete(recipe.id)} className="text-gray-400 hover:text-red-500 transition p-1">
+                <Trash2 size={18} />
+              </button>
+            </motion.div>
+          ))}
+        </AnimatePresence>
       </div>
     </div>
   )
