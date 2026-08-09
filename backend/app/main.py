@@ -1,4 +1,4 @@
-from app.database import init_db
+﻿from app.database import init_db
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.core.config import settings
@@ -17,6 +17,7 @@ from app.meals.router import router as meals_router
 from app.ai.router import router as ai_router
 from app.dashboard.router import router as dashboard_router
 from app.reports.router import router as reports_router
+from app.nutrition.router import router as nutrition_router
 
 setup_logging()
 logger.info("Starting NutriTrack application")
@@ -39,6 +40,7 @@ app.include_router(custom_foods_router)
 app.include_router(water_router)
 app.include_router(dashboard_router)
 app.include_router(reports_router)
+app.include_router(nutrition_router)
 
 
 @app.get("/")
