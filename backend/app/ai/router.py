@@ -44,3 +44,24 @@ def extract_and_log_meal(
         message=message,
         data=result.model_dump()
     )
+
+@router.get("/suggestion", response_model=None)
+def get_meal_suggestion_endpoint(
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    """
+    Returns a single AI-generated meal or snack suggestion based on the
+    user's remaining calories and macros for today.
+    """
+    from app.ai.service import generate_meal_suggestion
+
+    try:
+        suggestion = generate_meal_suggestion(db, current_user.id)
+    except ValueError as e:
+        return JSONResponse(status_code=400, content=error_response(message=str(e)))
+
+    return success_response(
+        message="Suggestion generated successfully",
+        data={"suggestion": suggestion},
+    )

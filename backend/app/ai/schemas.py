@@ -34,3 +34,6 @@ class AIExtractResponse(BaseModel):
     items: list[MatchedItem]
     meal_created: bool
     meal_id: Optional[UUID] = None
+
+class MealSuggestionResponse(BaseModel):
+    suggestion: str

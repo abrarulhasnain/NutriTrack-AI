@@ -119,3 +119,36 @@ def process_ai_extraction(db: Session, user_id, payload: AIExtractRequest) -> AI
         meal_created=meal_created,
         meal_id=meal_id,
     )
+
+def generate_meal_suggestion(db: Session, user_id) -> str:
+    """
+    Looks at the user's remaining calories and macros for today and asks
+    the AI model for a single, simple meal or snack suggestion.
+    """
+    from app.dashboard.service import build_dashboard
+    from app.ai.prompts.meal_suggestion_prompt import MEAL_SUGGESTION_PROMPT
+
+    dashboard = build_dashboard(db=db, user_id=user_id, target_date=date.today())
+
+    remaining_calories = dashboard.calories.goal - dashboard.calories.consumed
+    remaining_protein = dashboard.protein.goal - dashboard.protein.consumed
+    remaining_carbs = dashboard.carbs.goal - dashboard.carbs.consumed
+    remaining_fat = dashboard.fat.goal - dashboard.fat.consumed
+
+    prompt = MEAL_SUGGESTION_PROMPT.format(
+        remaining_calories=remaining_calories,
+        remaining_protein=remaining_protein,
+        remaining_carbs=remaining_carbs,
+        remaining_fat=remaining_fat,
+    )
+
+    try:
+        response = client.chat.completions.create(
+            model="llama-3.1-8b-instant",
+            messages=[{"role": "system", "content": prompt}],
+            temperature=0.7,
+        )
+    except Exception:
+        raise ValueError("AI service is currently unavailable, please try again later")
+
+    return response.choices[0].message.content.strip()
