@@ -4,6 +4,21 @@ import { motion } from 'framer-motion'
 import { UserCircle } from 'lucide-react'
 import api from '@/api/axiosInstance'
 
+const GENDER_OPTIONS = ['Male', 'Female', 'Other', 'Prefer not to say']
+const ACTIVITY_LEVEL_OPTIONS = [
+  'Sedentary',
+  'Lightly Active',
+  'Moderately Active',
+  'Very Active',
+  'Extra Active',
+]
+const FITNESS_GOAL_OPTIONS = [
+  'Lose Weight',
+  'Maintain Weight',
+  'Gain Weight',
+  'Build Muscle',
+]
+
 export default function ProfileSetup() {
   const navigate = useNavigate()
 
@@ -57,7 +72,7 @@ export default function ProfileSetup() {
     fetchExistingProfile()
   }, [])
 
-  function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
+  function handleChange(e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) {
     setFormData({ ...formData, [e.target.name]: e.target.value })
   }
 
@@ -93,22 +108,8 @@ export default function ProfileSetup() {
     }
   }
 
-  const fields: { name: keyof typeof formData; label: string; type?: string }[] = [
-    { name: 'full_name', label: 'Full Name' },
-    { name: 'age', label: 'Age', type: 'number' },
-    { name: 'gender', label: 'Gender' },
-    { name: 'height_cm', label: 'Height (cm)', type: 'number' },
-    { name: 'weight_kg', label: 'Weight (kg)', type: 'number' },
-    { name: 'activity_level', label: 'Activity Level' },
-    { name: 'fitness_goal', label: 'Fitness Goal' },
-    { name: 'calorie_goal', label: 'Calorie Goal', type: 'number' },
-    { name: 'protein_goal', label: 'Protein Goal (g)', type: 'number' },
-    { name: 'carbs_goal', label: 'Carbs Goal (g)', type: 'number' },
-    { name: 'fat_goal', label: 'Fat Goal (g)', type: 'number' },
-    { name: 'water_goal', label: 'Water Goal (ml)', type: 'number' },
-  ]
-
   const inputClass = "w-full rounded-full border border-gray-200 px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400 transition"
+  const selectClass = `${inputClass} bg-white appearance-none`
 
   if (pageLoading) {
     return <p className="text-center mt-10 text-gray-400">Loading...</p>
@@ -132,18 +133,38 @@ export default function ProfileSetup() {
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-3">
-          {fields.map((field) => (
-            <input
-              key={field.name}
-              name={field.name}
-              type={field.type || 'text'}
-              placeholder={field.label}
-              value={formData[field.name]}
-              onChange={handleChange}
-              className={inputClass}
-              required
-            />
-          ))}
+          <input name="full_name" type="text" placeholder="Full Name" value={formData.full_name} onChange={handleChange} className={inputClass} required />
+          <input name="age" type="number" placeholder="Age" value={formData.age} onChange={handleChange} className={inputClass} required />
+
+          <select name="gender" value={formData.gender} onChange={handleChange} className={selectClass} required>
+            <option value="" disabled>Select Gender</option>
+            {GENDER_OPTIONS.map((option) => (
+              <option key={option} value={option}>{option}</option>
+            ))}
+          </select>
+
+          <input name="height_cm" type="number" placeholder="Height (cm)" value={formData.height_cm} onChange={handleChange} className={inputClass} required />
+          <input name="weight_kg" type="number" placeholder="Weight (kg)" value={formData.weight_kg} onChange={handleChange} className={inputClass} required />
+
+          <select name="activity_level" value={formData.activity_level} onChange={handleChange} className={selectClass} required>
+            <option value="" disabled>Select Activity Level</option>
+            {ACTIVITY_LEVEL_OPTIONS.map((option) => (
+              <option key={option} value={option}>{option}</option>
+            ))}
+          </select>
+
+          <select name="fitness_goal" value={formData.fitness_goal} onChange={handleChange} className={selectClass} required>
+            <option value="" disabled>Select Fitness Goal</option>
+            {FITNESS_GOAL_OPTIONS.map((option) => (
+              <option key={option} value={option}>{option}</option>
+            ))}
+          </select>
+
+          <input name="calorie_goal" type="number" placeholder="Calorie Goal" value={formData.calorie_goal} onChange={handleChange} className={inputClass} required />
+          <input name="protein_goal" type="number" placeholder="Protein Goal (g)" value={formData.protein_goal} onChange={handleChange} className={inputClass} required />
+          <input name="carbs_goal" type="number" placeholder="Carbs Goal (g)" value={formData.carbs_goal} onChange={handleChange} className={inputClass} required />
+          <input name="fat_goal" type="number" placeholder="Fat Goal (g)" value={formData.fat_goal} onChange={handleChange} className={inputClass} required />
+          <input name="water_goal" type="number" placeholder="Water Goal (ml)" value={formData.water_goal} onChange={handleChange} className={inputClass} required />
 
           {error && <p className="text-red-500 text-sm">{error}</p>}
 
