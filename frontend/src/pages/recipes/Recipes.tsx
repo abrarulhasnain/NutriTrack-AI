@@ -2,9 +2,11 @@ import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { ChefHat, Trash2, X } from 'lucide-react'
 import api from '@/api/axiosInstance'
+import FoodSearchInput from '@/components/shared/FoodSearchInput'
 
 interface RecipeItem {
   food_id: string
+  food_name: string
   quantity: number
   unit: string
 }
@@ -25,7 +27,7 @@ export default function Recipes() {
   const [name, setName] = useState('')
   const [description, setDescription] = useState('')
   const [servings, setServings] = useState(1)
-  const [items, setItems] = useState<RecipeItem[]>([{ food_id: '', quantity: 0, unit: 'g' }])
+  const [items, setItems] = useState<RecipeItem[]>([{ food_id: '', food_name: '', quantity: 0, unit: 'g' }])
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
   const [fetching, setFetching] = useState(true)
@@ -51,8 +53,14 @@ export default function Recipes() {
     setItems(newItems)
   }
 
+  function handleFoodSelect(index: number, foodId: string, foodName: string) {
+    const newItems = [...items]
+    newItems[index] = { ...newItems[index], food_id: foodId, food_name: foodName }
+    setItems(newItems)
+  }
+
   function addItemRow() {
-    setItems([...items, { food_id: '', quantity: 0, unit: 'g' }])
+    setItems([...items, { food_id: '', food_name: '', quantity: 0, unit: 'g' }])
   }
 
   function removeItemRow(index: number) {
@@ -62,6 +70,12 @@ export default function Recipes() {
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     setError('')
+
+    if (items.some((item) => !item.food_id)) {
+      setError('Please select a valid food for each ingredient from the dropdown.')
+      return
+    }
+
     setLoading(true)
 
     const payload = {
@@ -81,11 +95,11 @@ export default function Recipes() {
       setName('')
       setDescription('')
       setServings(1)
-      setItems([{ food_id: '', quantity: 0, unit: 'g' }])
+      setItems([{ food_id: '', food_name: '', quantity: 0, unit: 'g' }])
 
       await fetchRecipes()
     } catch (err) {
-      setError('Failed to create recipe. Check your food IDs and try again.')
+      setError('Failed to create recipe. Please try again.')
       console.error(err)
     } finally {
       setLoading(false)
@@ -132,34 +146,34 @@ export default function Recipes() {
           <div>
             <p className="text-sm font-medium text-gray-600 mb-2 px-1">Ingredients</p>
             <div className="space-y-2">
-             {items.map((item, index) => (
-              <div key={index} className="grid grid-cols-[1fr_80px_64px_auto] gap-2 items-center">
-                  <input
-                    placeholder="Food ID"
-                    value={item.food_id}
-                    onChange={(e) => updateItem(index, 'food_id', e.target.value)}
-                    className={`${inputClass} flex-1`}
-                    required
+              {items.map((item, index) => (
+                <div key={index} className="grid grid-cols-[1fr_80px_64px_auto] gap-2 items-center">
+                  <FoodSearchInput
+                    value={item.food_name}
+                    onSelect={(foodId, foodName) => handleFoodSelect(index, foodId, foodName)}
+                    placeholder="Search food (e.g. chicken)"
                   />
                   <input
                     type="number"
                     placeholder="Qty"
                     value={item.quantity}
                     onChange={(e) => updateItem(index, 'quantity', e.target.value)}
-                    className={`${inputClass} w-20`}
+                    className={inputClass}
                     required
                   />
                   <input
                     placeholder="Unit"
                     value={item.unit}
                     onChange={(e) => updateItem(index, 'unit', e.target.value)}
-                    className={`${inputClass} w-16`}
+                    className={inputClass}
                     required
                   />
-                  {items.length > 1 && (
+                  {items.length > 1 ? (
                     <button type="button" onClick={() => removeItemRow(index)} className="text-gray-400 hover:text-red-500 transition p-1">
                       <X size={18} />
                     </button>
+                  ) : (
+                    <span></span>
                   )}
                 </div>
               ))}
