@@ -132,8 +132,8 @@ export default function Recipes() {
           <div>
             <p className="text-sm font-medium text-gray-600 mb-2 px-1">Ingredients</p>
             <div className="space-y-2">
-              {items.map((item, index) => (
-                <div key={index} className="flex gap-2 items-center">
+             {items.map((item, index) => (
+              <div key={index} className="grid grid-cols-[1fr_80px_64px_auto] gap-2 items-center">
                   <input
                     placeholder="Food ID"
                     value={item.food_id}
