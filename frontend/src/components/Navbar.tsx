@@ -1,10 +1,11 @@
 ﻿import { NavLink, useNavigate } from "react-router-dom"
-import { LayoutDashboard, Utensils, User, Droplet, ChefHat, Salad, BarChart3, LogOut } from "lucide-react"
+import { LayoutDashboard, PlusCircle, History, User, Droplet, ChefHat, Salad, BarChart3, LogOut } from "lucide-react"
 import { useAuth } from "@/context/useAuth"
 
 const navItems = [
   { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
-  { to: "/meals", label: "Meals", icon: Utensils },
+  { to: "/meals/log", label: "Log Meal", icon: PlusCircle },
+  { to: "/meals", label: "History", icon: History },
   { to: "/profile-setup", label: "Profile", icon: User },
   { to: "/water", label: "Water", icon: Droplet },
   { to: "/recipes", label: "Recipes", icon: ChefHat },
