@@ -1,10 +1,12 @@
 ﻿from sqlalchemy.orm import Session
-from app.nutrition.models import Food
+from app.nutrition.repository import get_all_foods, search_foods
 
 
-def get_all_foods(db: Session) -> list[Food]:
+def get_foods(db: Session, search: str = ""):
     """
-    Fetches every food item from the reference database.
-    Used by the frontend to display food names alongside meal items.
+    Returns foods matching the search query, or the full reference list
+    if no search term is provided (used by the frontend for local caching).
     """
-    return db.query(Food).order_by(Food.name).all()
+    if search and len(search.strip()) >= 2:
+        return search_foods(db, search.strip())
+    return get_all_foods(db)
