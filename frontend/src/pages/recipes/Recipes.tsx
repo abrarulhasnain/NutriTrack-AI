@@ -106,7 +106,10 @@ export default function Recipes() {
     }
   }
 
-  async function handleDelete(id: string) {
+  async function handleDelete(id: string, name: string) {
+    const confirmed = window.confirm(`Delete "${name}"? This cannot be undone.`)
+    if (!confirmed) return
+
     try {
       await api.delete(`/recipes/${id}`)
       await fetchRecipes()
@@ -221,7 +224,7 @@ export default function Recipes() {
                 </p>
                 <p className="text-xs text-gray-400">Servings: {recipe.servings}</p>
               </div>
-              <button onClick={() => handleDelete(recipe.id)} className="text-gray-400 hover:text-red-500 transition p-1">
+              <button onClick={() => handleDelete(recipe.id, recipe.name)} className="text-gray-400 hover:text-red-500 transition p-1">
                 <Trash2 size={18} />
               </button>
             </motion.div>

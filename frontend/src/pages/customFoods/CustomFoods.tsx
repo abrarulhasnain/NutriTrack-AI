@@ -77,7 +77,10 @@ export default function CustomFoods() {
     }
   }
 
-  async function handleDelete(id: string) {
+  async function handleDelete(id: string, name: string) {
+    const confirmed = window.confirm(`Delete "${name}"? This cannot be undone.`)
+    if (!confirmed) return
+
     try {
       await api.delete(`/custom-foods/${id}`)
       await fetchFoods()
@@ -163,7 +166,7 @@ export default function CustomFoods() {
                   {food.calories} cal | {food.protein}g protein | {food.carbs}g carbs | {food.fat}g fat
                 </p>
               </div>
-              <button onClick={() => handleDelete(food.id)} className="text-gray-400 hover:text-red-500 transition p-1">
+              <button onClick={() => handleDelete(food.id, food.name)} className="text-gray-400 hover:text-red-500 transition p-1">
                 <Trash2 size={18} />
               </button>
             </motion.div>
