@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+﻿import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { UserCircle } from 'lucide-react'
@@ -18,6 +18,15 @@ const FITNESS_GOAL_OPTIONS = [
   'Gain Weight',
   'Build Muscle',
 ]
+
+function Field({ label, children }: { label: string; children: React.ReactNode }) {
+  return (
+    <div className="flex flex-col gap-1">
+      <label className="text-xs font-medium text-gray-500">{label}</label>
+      {children}
+    </div>
+  )
+}
 
 export default function ProfileSetup() {
   const navigate = useNavigate()
@@ -133,38 +142,68 @@ export default function ProfileSetup() {
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-3">
-          <input name="full_name" type="text" placeholder="Full Name" value={formData.full_name} onChange={handleChange} className={inputClass} required />
-          <input name="age" type="number" placeholder="Age" value={formData.age} onChange={handleChange} className={inputClass} required />
+          <Field label="Full Name">
+            <input name="full_name" type="text" placeholder="e.g. Abrar ul Hasnain" value={formData.full_name} onChange={handleChange} className={inputClass} required />
+          </Field>
 
-          <select name="gender" value={formData.gender} onChange={handleChange} className={selectClass} required>
-            <option value="" disabled>Select Gender</option>
-            {GENDER_OPTIONS.map((option) => (
-              <option key={option} value={option}>{option}</option>
-            ))}
-          </select>
+          <Field label="Age">
+            <input name="age" type="number" placeholder="e.g. 25" value={formData.age} onChange={handleChange} className={inputClass} required />
+          </Field>
 
-          <input name="height_cm" type="number" placeholder="Height (cm)" value={formData.height_cm} onChange={handleChange} className={inputClass} required />
-          <input name="weight_kg" type="number" placeholder="Weight (kg)" value={formData.weight_kg} onChange={handleChange} className={inputClass} required />
+          <Field label="Gender">
+            <select name="gender" value={formData.gender} onChange={handleChange} className={selectClass} required>
+              <option value="" disabled>Select Gender</option>
+              {GENDER_OPTIONS.map((option) => (
+                <option key={option} value={option}>{option}</option>
+              ))}
+            </select>
+          </Field>
 
-          <select name="activity_level" value={formData.activity_level} onChange={handleChange} className={selectClass} required>
-            <option value="" disabled>Select Activity Level</option>
-            {ACTIVITY_LEVEL_OPTIONS.map((option) => (
-              <option key={option} value={option}>{option}</option>
-            ))}
-          </select>
+          <Field label="Height (cm)">
+            <input name="height_cm" type="number" placeholder="e.g. 175" value={formData.height_cm} onChange={handleChange} className={inputClass} required />
+          </Field>
 
-          <select name="fitness_goal" value={formData.fitness_goal} onChange={handleChange} className={selectClass} required>
-            <option value="" disabled>Select Fitness Goal</option>
-            {FITNESS_GOAL_OPTIONS.map((option) => (
-              <option key={option} value={option}>{option}</option>
-            ))}
-          </select>
+          <Field label="Weight (kg)">
+            <input name="weight_kg" type="number" placeholder="e.g. 70" value={formData.weight_kg} onChange={handleChange} className={inputClass} required />
+          </Field>
 
-          <input name="calorie_goal" type="number" placeholder="Calorie Goal" value={formData.calorie_goal} onChange={handleChange} className={inputClass} required />
-          <input name="protein_goal" type="number" placeholder="Protein Goal (g)" value={formData.protein_goal} onChange={handleChange} className={inputClass} required />
-          <input name="carbs_goal" type="number" placeholder="Carbs Goal (g)" value={formData.carbs_goal} onChange={handleChange} className={inputClass} required />
-          <input name="fat_goal" type="number" placeholder="Fat Goal (g)" value={formData.fat_goal} onChange={handleChange} className={inputClass} required />
-          <input name="water_goal" type="number" placeholder="Water Goal (ml)" value={formData.water_goal} onChange={handleChange} className={inputClass} required />
+          <Field label="Activity Level">
+            <select name="activity_level" value={formData.activity_level} onChange={handleChange} className={selectClass} required>
+              <option value="" disabled>Select Activity Level</option>
+              {ACTIVITY_LEVEL_OPTIONS.map((option) => (
+                <option key={option} value={option}>{option}</option>
+              ))}
+            </select>
+          </Field>
+
+          <Field label="Fitness Goal">
+            <select name="fitness_goal" value={formData.fitness_goal} onChange={handleChange} className={selectClass} required>
+              <option value="" disabled>Select Fitness Goal</option>
+              {FITNESS_GOAL_OPTIONS.map((option) => (
+                <option key={option} value={option}>{option}</option>
+              ))}
+            </select>
+          </Field>
+
+          <Field label="Calories (kcal)">
+            <input name="calorie_goal" type="number" placeholder="e.g. 2000" value={formData.calorie_goal} onChange={handleChange} className={inputClass} required />
+          </Field>
+
+          <Field label="Protein (g)">
+            <input name="protein_goal" type="number" placeholder="e.g. 150" value={formData.protein_goal} onChange={handleChange} className={inputClass} required />
+          </Field>
+
+          <Field label="Carbs (g)">
+            <input name="carbs_goal" type="number" placeholder="e.g. 200" value={formData.carbs_goal} onChange={handleChange} className={inputClass} required />
+          </Field>
+
+          <Field label="Fat (g)">
+            <input name="fat_goal" type="number" placeholder="e.g. 65" value={formData.fat_goal} onChange={handleChange} className={inputClass} required />
+          </Field>
+
+          <Field label="Water (ml)">
+            <input name="water_goal" type="number" placeholder="e.g. 2500" value={formData.water_goal} onChange={handleChange} className={inputClass} required />
+          </Field>
 
           {error && <p className="text-red-500 text-sm">{error}</p>}
 

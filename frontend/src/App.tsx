@@ -6,7 +6,6 @@ import { AuthCallback } from './pages/auth/AuthCallback'
 import { Onboarding } from './pages/onboarding/Onboarding'
 import { Dashboard } from './pages/dashboard/Dashboard'
 import { MealHistory } from './pages/meals/MealHistory'
-import { AiMealLogger } from './pages/meals/AiMealLogger'
 import ProfileSetup from './pages/profile/ProfileSetup'
 import WaterTracker from './pages/water/WaterTracker'
 import Recipes from './pages/recipes/Recipes'
@@ -43,14 +42,6 @@ function App() {
             element={
               <ProtectedRoute>
                 <MealHistory />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/meals/log"
-            element={
-              <ProtectedRoute>
-                <AiMealLogger />
               </ProtectedRoute>
             }
           />

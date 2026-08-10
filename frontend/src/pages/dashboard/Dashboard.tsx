@@ -1,10 +1,12 @@
-﻿import { useEffect, useState } from "react"
+﻿import { useEffect, useState, useCallback } from "react"
 import { motion } from "framer-motion"
 import api from "@/api/axiosInstance"
 import { getFoodsMap, type Food } from "@/api/foodsCache"
 import { CircularProgress } from "@/components/CircularProgress"
 import { WeeklyTrend } from "@/components/WeeklyTrend"
+import { WaterWeeklyTrend } from "@/components/WaterWeeklyTrend"
 import { MealSuggestion } from "@/components/MealSuggestion"
+import { MealLoggerWidget } from "@/components/MealLoggerWidget"
 import { useAuth } from "@/context/useAuth"
 
 interface NutrientProgress {
@@ -66,26 +68,26 @@ export function Dashboard() {
     day: "numeric",
   })
 
-  useEffect(() => {
-    async function loadDashboard() {
-      const today = new Date().toISOString().split("T")[0]
+  const loadDashboard = useCallback(async () => {
+    const today = new Date().toISOString().split("T")[0]
 
-      try {
-        const [dashboardResponse, foods] = await Promise.all([
-          api.get("/dashboard/", { params: { target_date: today } }),
-          getFoodsMap(),
-        ])
-        setData(dashboardResponse.data.data)
-        setFoodsMap(foods)
-      } catch {
-        setError("Could not load your dashboard. Please make sure your profile is set up.")
-      } finally {
-        setLoading(false)
-      }
+    try {
+      const [dashboardResponse, foods] = await Promise.all([
+        api.get("/dashboard/", { params: { target_date: today } }),
+        getFoodsMap(),
+      ])
+      setData(dashboardResponse.data.data)
+      setFoodsMap(foods)
+    } catch {
+      setError("Could not load your dashboard. Please make sure your profile is set up.")
+    } finally {
+      setLoading(false)
     }
-
-    loadDashboard()
   }, [])
+
+  useEffect(() => {
+    loadDashboard()
+  }, [loadDashboard])
 
   function getFoodName(item: MealItem): string {
     if (item.food_id && foodsMap.has(item.food_id)) {
@@ -117,13 +119,22 @@ export function Dashboard() {
         transition={{ duration: 0.4 }}
         className="bg-white rounded-2xl shadow-sm border border-gray-100 p-5 mb-6"
       >
-        <MealSuggestion />
+        <MealLoggerWidget onMealLogged={loadDashboard} />
       </motion.div>
 
       <motion.div
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4, delay: 0.1 }}
+        className="bg-white rounded-2xl shadow-sm border border-gray-100 p-5 mb-6"
+      >
+        <MealSuggestion />
+      </motion.div>
+
+      <motion.div
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.4, delay: 0.2 }}
         className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 flex flex-col items-center mb-6"
       >
         <CircularProgress
@@ -139,7 +150,7 @@ export function Dashboard() {
       <motion.div
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.4, delay: 0.2 }}
+        transition={{ duration: 0.4, delay: 0.3 }}
         className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 grid grid-cols-2 sm:grid-cols-4 gap-4 mb-6"
       >
         <CircularProgress consumed={data.protein.consumed} goal={data.protein.goal} label="Protein" unit="g" color="#8b5cf6" size={90} />
@@ -151,17 +162,27 @@ export function Dashboard() {
       <motion.div
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.4, delay: 0.3 }}
+        transition={{ duration: 0.4, delay: 0.4 }}
         className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 mb-6"
       >
-        <h2 className="text-sm font-semibold text-gray-500 mb-4">Weekly Trend</h2>
+        <h2 className="text-sm font-semibold text-gray-500 mb-4">Weekly Calorie Trend</h2>
         <WeeklyTrend />
       </motion.div>
 
       <motion.div
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.4, delay: 0.4 }}
+        transition={{ duration: 0.4, delay: 0.5 }}
+        className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 mb-6"
+      >
+        <h2 className="text-sm font-semibold text-gray-500 mb-4">Weekly Water Trend</h2>
+        <WaterWeeklyTrend />
+      </motion.div>
+
+      <motion.div
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.4, delay: 0.6 }}
         className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6"
       >
         <h2 className="text-sm font-semibold text-gray-500 mb-4">Today's Meals</h2>
