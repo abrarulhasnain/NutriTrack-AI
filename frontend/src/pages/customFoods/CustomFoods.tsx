@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Apple, Trash2 } from 'lucide-react'
+import toast from 'react-hot-toast'
 import api from '@/api/axiosInstance'
 
 interface CustomFood {
@@ -22,7 +23,6 @@ export default function CustomFoods() {
     name: '', serving_size: '', serving_unit: '', calories: '',
     protein: '', carbs: '', fat: '', fiber: '', sugar: '',
   })
-  const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
   const [fetching, setFetching] = useState(true)
 
@@ -47,7 +47,6 @@ export default function CustomFoods() {
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
-    setError('')
     setLoading(true)
 
     try {
@@ -69,8 +68,9 @@ export default function CustomFoods() {
       })
 
       await fetchFoods()
+      toast.success('Custom food added!')
     } catch (err) {
-      setError('Failed to create custom food. Please try again.')
+      toast.error('Failed to create custom food. Please try again.')
       console.error(err)
     } finally {
       setLoading(false)
@@ -81,7 +81,9 @@ export default function CustomFoods() {
     try {
       await api.delete(`/custom-foods/${id}`)
       await fetchFoods()
+      toast.success('Custom food deleted.')
     } catch (err) {
+      toast.error('Failed to delete. Please try again.')
       console.error(err)
     }
   }
@@ -125,8 +127,6 @@ export default function CustomFoods() {
             <input name="fiber" type="number" placeholder="Fiber" value={formData.fiber} onChange={handleChange} className={inputClass} required />
             <input name="sugar" type="number" placeholder="Sugar" value={formData.sugar} onChange={handleChange} className={inputClass} required />
           </div>
-
-          {error && <p className="text-red-500 text-sm">{error}</p>}
 
           <button
             type="submit"

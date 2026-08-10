@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { ChefHat, Trash2, X } from 'lucide-react'
+import toast from 'react-hot-toast'
 import api from '@/api/axiosInstance'
 import FoodSearchInput from '@/components/shared/FoodSearchInput'
 
@@ -28,7 +29,6 @@ export default function Recipes() {
   const [description, setDescription] = useState('')
   const [servings, setServings] = useState(1)
   const [items, setItems] = useState<RecipeItem[]>([{ food_id: '', food_name: '', quantity: 0, unit: 'g' }])
-  const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
   const [fetching, setFetching] = useState(true)
 
@@ -69,10 +69,9 @@ export default function Recipes() {
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
-    setError('')
 
     if (items.some((item) => !item.food_id)) {
-      setError('Please select a valid food for each ingredient from the dropdown.')
+      toast.error('Please select a valid food for each ingredient from the dropdown.')
       return
     }
 
@@ -98,8 +97,9 @@ export default function Recipes() {
       setItems([{ food_id: '', food_name: '', quantity: 0, unit: 'g' }])
 
       await fetchRecipes()
+      toast.success('Recipe created!')
     } catch (err) {
-      setError('Failed to create recipe. Please try again.')
+      toast.error('Failed to create recipe. Please try again.')
       console.error(err)
     } finally {
       setLoading(false)
@@ -110,7 +110,9 @@ export default function Recipes() {
     try {
       await api.delete(`/recipes/${id}`)
       await fetchRecipes()
+      toast.success('Recipe deleted.')
     } catch (err) {
+      toast.error('Failed to delete. Please try again.')
       console.error(err)
     }
   }
@@ -182,8 +184,6 @@ export default function Recipes() {
               + Add Ingredient
             </button>
           </div>
-
-          {error && <p className="text-red-500 text-sm">{error}</p>}
 
           <button
             type="submit"

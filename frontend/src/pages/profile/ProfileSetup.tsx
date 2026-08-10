@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { UserCircle } from 'lucide-react'
+import toast from 'react-hot-toast'
 import api from '@/api/axiosInstance'
 
 const GENDER_OPTIONS = ['Male', 'Female', 'Other', 'Prefer not to say']
@@ -37,7 +38,6 @@ export default function ProfileSetup() {
     water_goal: '',
   })
   const [isEditing, setIsEditing] = useState(false)
-  const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
   const [pageLoading, setPageLoading] = useState(true)
 
@@ -78,7 +78,6 @@ export default function ProfileSetup() {
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
-    setError('')
     setLoading(true)
 
     const payload = {
@@ -99,9 +98,10 @@ export default function ProfileSetup() {
       } else {
         await api.post('/profiles/', payload)
       }
+      toast.success(isEditing ? 'Profile updated!' : 'Profile saved!')
       navigate('/dashboard')
     } catch (err) {
-      setError('Something went wrong while saving your profile. Please try again.')
+      toast.error('Something went wrong while saving your profile. Please try again.')
       console.error(err)
     } finally {
       setLoading(false)
@@ -165,8 +165,6 @@ export default function ProfileSetup() {
           <input name="carbs_goal" type="number" placeholder="Carbs Goal (g)" value={formData.carbs_goal} onChange={handleChange} className={inputClass} required />
           <input name="fat_goal" type="number" placeholder="Fat Goal (g)" value={formData.fat_goal} onChange={handleChange} className={inputClass} required />
           <input name="water_goal" type="number" placeholder="Water Goal (ml)" value={formData.water_goal} onChange={handleChange} className={inputClass} required />
-
-          {error && <p className="text-red-500 text-sm">{error}</p>}
 
           <button
             type="submit"

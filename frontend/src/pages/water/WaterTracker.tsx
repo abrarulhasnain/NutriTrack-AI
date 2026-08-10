@@ -1,12 +1,12 @@
 import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { Droplet } from 'lucide-react'
+import toast from 'react-hot-toast'
 import api from '@/api/axiosInstance'
 
 export default function WaterTracker() {
   const [total, setTotal] = useState<number>(0)
   const [loading, setLoading] = useState(false)
-  const [error, setError] = useState('')
 
   const today = new Date().toISOString().split('T')[0]
 
@@ -22,7 +22,6 @@ export default function WaterTracker() {
   }
 
   async function addWater(amount: number) {
-    setError('')
     setLoading(true)
 
     try {
@@ -31,8 +30,9 @@ export default function WaterTracker() {
         amount_ml: amount,
       })
       await fetchTotal()
+      toast.success(`Added ${amount}ml!`)
     } catch (err) {
-      setError('Failed to log water. Please try again.')
+      toast.error('Failed to log water. Please try again.')
       console.error(err)
     } finally {
       setLoading(false)
@@ -84,8 +84,6 @@ export default function WaterTracker() {
             +500 ml
           </button>
         </div>
-
-        {error && <p className="text-red-500 text-sm mt-4">{error}</p>}
       </motion.div>
     </div>
   )

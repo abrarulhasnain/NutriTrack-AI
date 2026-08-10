@@ -70,6 +70,7 @@ export default function FoodSearchInput({ value, onSelect, placeholder }: Props)
             <button
               key={food.id}
               type="button"
+              onMouseDown={(e) => e.preventDefault()}
               onClick={() => handleSelect(food)}
               className="w-full text-left px-4 py-2 hover:bg-indigo-50 text-sm transition"
             >
