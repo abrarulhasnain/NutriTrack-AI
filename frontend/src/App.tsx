@@ -3,6 +3,8 @@ import { AuthProvider } from './context/AuthProvider'
 import { ProtectedRoute } from './context/ProtectedRoute'
 import { AuthPage } from './pages/auth/AuthPage'
 import { AuthCallback } from './pages/auth/AuthCallback'
+import { ForgotPassword } from './pages/auth/ForgotPassword'
+import { ResetPassword } from './pages/auth/ResetPassword'
 import { Onboarding } from './pages/onboarding/Onboarding'
 import { Dashboard } from './pages/dashboard/Dashboard'
 import { MealHistory } from './pages/meals/MealHistory'
@@ -20,6 +22,8 @@ function App() {
           <Route path="/" element={<Navigate to="/dashboard" replace />} />
           <Route path="/login" element={<AuthPage />} />
           <Route path="/auth/callback" element={<AuthCallback />} />
+          <Route path="/forgot-password" element={<ForgotPassword />} />
+          <Route path="/auth/reset-password" element={<ResetPassword />} />
 
           <Route
             path="/onboarding"

@@ -1,5 +1,5 @@
 ﻿import { useState } from "react"
-import { useNavigate } from "react-router-dom"
+import { useNavigate, Link } from "react-router-dom"
 import { Mail, Lock, Eye, EyeOff } from "lucide-react"
 import { supabase } from "@/api/supabaseClient"
 import api from "@/api/axiosInstance"
@@ -27,8 +27,6 @@ export function LoginForm() {
       return
     }
 
-    // Check whether the user has already completed their profile.
-    // New accounts are sent to onboarding; existing profiles go straight to the dashboard.
     try {
       await api.get("/profiles/")
       navigate("/dashboard")
@@ -75,12 +73,18 @@ export function LoginForm() {
           </button>
         </div>
 
+        <div className="text-right -mt-2">
+          <Link to="/forgot-password" className="text-xs text-indigo-500 hover:underline">
+            Forgot password?
+          </Link>
+        </div>
+
         {error && <p className="text-sm text-red-500 text-center">{error}</p>}
 
         <Button
           type="submit"
           disabled={loading}
-          className="rounded-full bg-indigo-500 hover:bg-indigo-600 py-6 mt-2"
+          className="rounded-full bg-indigo-500 hover:bg-indigo-600 py-6"
         >
           {loading ? "Signing in..." : "Login"}
         </Button>

@@ -1,4 +1,5 @@
 ﻿import { useEffect, useState } from "react"
+import { Trash2 } from "lucide-react"
 import api from "@/api/axiosInstance"
 import { getFoodsMap, type Food } from "@/api/foodsCache"
 
@@ -9,9 +10,6 @@ interface MealItem {
   quantity: number
   unit: string
   calories: number
-  protein: number
-  carbs: number
-  fat: number
 }
 
 interface Meal {
@@ -32,23 +30,24 @@ export function MealHistory() {
   const [foodsMap, setFoodsMap] = useState<Map<string, Food>>(new Map())
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState("")
+  const [deletingId, setDeletingId] = useState<string | null>(null)
+
+  async function loadData() {
+    try {
+      const [mealsResponse, foods] = await Promise.all([
+        api.get("/meals/"),
+        getFoodsMap(),
+      ])
+      setMeals(mealsResponse.data.data)
+      setFoodsMap(foods)
+    } catch {
+      setError("Failed to load meal history. Please try again.")
+    } finally {
+      setLoading(false)
+    }
+  }
 
   useEffect(() => {
-    async function loadData() {
-      try {
-        const [mealsResponse, foods] = await Promise.all([
-          api.get("/meals/"),
-          getFoodsMap(),
-        ])
-        setMeals(mealsResponse.data.data)
-        setFoodsMap(foods)
-      } catch {
-        setError("Failed to load meal history. Please try again.")
-      } finally {
-        setLoading(false)
-      }
-    }
-
     loadData()
   }, [])
 
@@ -57,6 +56,21 @@ export function MealHistory() {
       return foodsMap.get(item.food_id)!.name
     }
     return "Unknown food"
+  }
+
+  async function handleDelete(mealId: string) {
+    const confirmed = window.confirm("Delete this meal? This cannot be undone.")
+    if (!confirmed) return
+
+    setDeletingId(mealId)
+    try {
+      await api.delete(`/meals/${mealId}`)
+      setMeals((prev) => prev.filter((meal) => meal.id !== mealId))
+    } catch {
+      setError("Failed to delete the meal. Please try again.")
+    } finally {
+      setDeletingId(null)
+    }
   }
 
   if (loading) {
@@ -83,7 +97,17 @@ export function MealHistory() {
                 <span className="text-xs font-semibold uppercase tracking-wide text-indigo-500">
                   {meal.meal_type}
                 </span>
-                <span className="text-xs text-gray-400">{meal.meal_date}</span>
+                <div className="flex items-center gap-3">
+                  <span className="text-xs text-gray-400">{meal.meal_date}</span>
+                  <button
+                    onClick={() => handleDelete(meal.id)}
+                    disabled={deletingId === meal.id}
+                    className="text-gray-300 hover:text-red-500 transition-colors disabled:opacity-50"
+                    title="Delete meal"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </button>
+                </div>
               </div>
 
               <ul className="flex flex-col gap-1 mb-3">
