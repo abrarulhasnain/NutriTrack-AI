@@ -49,3 +49,19 @@ class UserProfileResponse(BaseModel):
     water_goal: int
 
     model_config = ConfigDict(from_attributes=True)
+
+class GoalSuggestionRequest(BaseModel):
+    age: int
+    gender: str
+    height_cm: Decimal
+    weight_kg: Decimal
+    activity_level: str
+    fitness_goal: str
+
+
+class GoalSuggestionResponse(BaseModel):
+    calorie_goal: int
+    protein_goal: int
+    carbs_goal: int
+    fat_goal: int
+    water_goal: int

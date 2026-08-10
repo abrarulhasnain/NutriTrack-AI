@@ -2,6 +2,7 @@
 import { useNavigate } from "react-router-dom"
 import { Mail, Lock, Eye, EyeOff } from "lucide-react"
 import { supabase } from "@/api/supabaseClient"
+import api from "@/api/axiosInstance"
 import { Button } from "@/components/ui/button"
 import { SocialButtons } from "./SocialButtons"
 
@@ -20,14 +21,22 @@ export function LoginForm() {
 
     const { error } = await supabase.auth.signInWithPassword({ email, password })
 
-    setLoading(false)
-
     if (error) {
+      setLoading(false)
       setError(error.message)
       return
     }
 
-    navigate("/dashboard")
+    // Check whether the user has already completed their profile.
+    // New accounts are sent to onboarding; existing profiles go straight to the dashboard.
+    try {
+      await api.get("/profiles/")
+      navigate("/dashboard")
+    } catch {
+      navigate("/onboarding")
+    } finally {
+      setLoading(false)
+    }
   }
 
   return (

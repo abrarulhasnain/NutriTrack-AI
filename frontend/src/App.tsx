@@ -3,6 +3,7 @@ import { AuthProvider } from './context/AuthProvider'
 import { ProtectedRoute } from './context/ProtectedRoute'
 import { AuthPage } from './pages/auth/AuthPage'
 import { AuthCallback } from './pages/auth/AuthCallback'
+import { Onboarding } from './pages/onboarding/Onboarding'
 import { Dashboard } from './pages/dashboard/Dashboard'
 import { MealHistory } from './pages/meals/MealHistory'
 import { AiMealLogger } from './pages/meals/AiMealLogger'
@@ -21,6 +22,14 @@ function App() {
           <Route path="/login" element={<AuthPage />} />
           <Route path="/auth/callback" element={<AuthCallback />} />
 
+          <Route
+            path="/onboarding"
+            element={
+              <ProtectedRoute>
+                <Onboarding />
+              </ProtectedRoute>
+            }
+          />
           <Route
             path="/dashboard"
             element={

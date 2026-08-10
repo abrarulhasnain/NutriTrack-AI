@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException
+﻿from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 
 from app.auth.dependencies import get_current_user
@@ -9,6 +9,7 @@ from app.profiles.schemas import (
     UserProfileCreate,
     UserProfileUpdate,
     UserProfileResponse,
+    GoalSuggestionRequest,
 )
 from app.profiles.service import (
     create_new_profile,
@@ -113,3 +114,30 @@ def delete_profile_endpoint(
     return success_response(
         message="Profile deleted successfully",
     )
+
+@router.post("/suggest-goals", response_model=dict)
+def suggest_goals_endpoint(
+    payload: GoalSuggestionRequest,
+    current_user: User = Depends(get_current_user),
+):
+    """
+    Calculates suggested calorie and macro goals based on the user's
+    body metrics and fitness goal, using the Mifflin-St Jeor equation.
+    Used during onboarding to pre-fill the goals step.
+    """
+    from app.profiles.calculator import calculate_nutrition_goals
+
+    goals = calculate_nutrition_goals(
+        age=payload.age,
+        gender=payload.gender,
+        height_cm=float(payload.height_cm),
+        weight_kg=float(payload.weight_kg),
+        activity_level=payload.activity_level,
+        fitness_goal=payload.fitness_goal,
+    )
+
+    return success_response(
+        message="Goals calculated successfully",
+        data=goals,
+    )
+
