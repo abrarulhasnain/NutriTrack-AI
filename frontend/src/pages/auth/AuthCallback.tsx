@@ -1,5 +1,6 @@
 ﻿import { useEffect, useState } from "react"
 import { useNavigate } from "react-router-dom"
+import { Loader2 } from "lucide-react"
 import { supabase } from "@/api/supabaseClient"
 import api from "@/api/axiosInstance"
 
@@ -9,8 +10,6 @@ export function AuthCallback() {
 
   useEffect(() => {
     async function completeRegistration() {
-      // After clicking the confirmation link, Supabase sets an active
-      // session automatically. Retrieve it to access the user's details.
       const { data: { session } } = await supabase.auth.getSession()
 
       if (!session) {
@@ -31,7 +30,6 @@ export function AuthCallback() {
         return
       }
 
-      // Sign out so the user signs in explicitly on the login screen.
       await supabase.auth.signOut()
 
       setStatus("Account confirmed. Redirecting to sign in...")
@@ -42,8 +40,9 @@ export function AuthCallback() {
   }, [navigate])
 
   return (
-    <div className="min-h-screen bg-slate-900 flex items-center justify-center">
-      <p className="text-white text-lg">{status}</p>
+    <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center gap-3 px-4">
+      <Loader2 className="w-6 h-6 text-indigo-500 animate-spin" />
+      <p className="text-gray-600 text-sm text-center">{status}</p>
     </div>
   )
 }

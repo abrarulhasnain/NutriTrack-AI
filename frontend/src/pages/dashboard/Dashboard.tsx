@@ -7,6 +7,7 @@ import { WeeklyTrend } from "@/components/WeeklyTrend"
 import { WaterWeeklyTrend } from "@/components/WaterWeeklyTrend"
 import { MealSuggestion } from "@/components/MealSuggestion"
 import { MealLoggerWidget } from "@/components/MealLoggerWidget"
+import { DashboardSkeleton } from "@/components/DashboardSkeleton"
 import { useAuth } from "@/context/useAuth"
 
 interface NutrientProgress {
@@ -97,7 +98,7 @@ export function Dashboard() {
   }
 
   if (loading) {
-    return <p className="text-center mt-10 text-gray-500">Loading dashboard...</p>
+    return <DashboardSkeleton />
   }
 
   if (error || !data) {

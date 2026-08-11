@@ -2,6 +2,7 @@
 import { Trash2 } from "lucide-react"
 import api from "@/api/axiosInstance"
 import { getFoodsMap, type Food } from "@/api/foodsCache"
+import { Skeleton } from "@/components/ui/skeleton"
 
 interface MealItem {
   id: string
@@ -74,7 +75,23 @@ export function MealHistory() {
   }
 
   if (loading) {
-    return <p className="text-center mt-10 text-gray-500">Loading meal history...</p>
+    return (
+      <div className="max-w-2xl mx-auto mt-10 px-4 pb-10">
+        <Skeleton className="h-7 w-40 mb-6" />
+        <div className="flex flex-col gap-4">
+          {[1, 2, 3].map((i) => (
+            <div key={i} className="bg-white rounded-2xl shadow-sm border border-gray-100 p-5">
+              <div className="flex justify-between mb-3">
+                <Skeleton className="h-4 w-16" />
+                <Skeleton className="h-4 w-20" />
+              </div>
+              <Skeleton className="h-4 w-full mb-2" />
+              <Skeleton className="h-4 w-3/4" />
+            </div>
+          ))}
+        </div>
+      </div>
+    )
   }
 
   if (error) {
