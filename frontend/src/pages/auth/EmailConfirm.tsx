@@ -4,38 +4,35 @@ import { Loader2 } from "lucide-react"
 import { supabase } from "@/api/supabaseClient"
 import api from "@/api/axiosInstance"
 
-export function AuthCallback() {
+export function EmailConfirm() {
   const navigate = useNavigate()
-  const [status, setStatus] = useState("Signing you in...")
+  const [status, setStatus] = useState("Confirming your account...")
 
   useEffect(() => {
-    async function completeOAuthSignIn() {
+    async function completeRegistration() {
       const { data: { session } } = await supabase.auth.getSession()
 
       if (!session) {
-        setStatus("Sign-in failed. Please try again.")
+        setStatus("Confirmation link is invalid or has expired.")
         return
       }
 
-      const fullName =
-        session.user.user_metadata?.full_name ?? session.user.user_metadata?.name ?? ""
+      const fullName = session.user.user_metadata?.full_name ?? ""
       const email = session.user.email ?? ""
 
       try {
         await api.post("/users/register", { email, full_name: fullName })
       } catch {
-        // Already registered - safe to ignore.
+        setStatus("Account confirmed, but profile setup failed. Please contact support.")
+        return
       }
 
-      try {
-        await api.get("/profiles/")
-        navigate("/dashboard")
-      } catch {
-        navigate("/onboarding")
-      }
+      await supabase.auth.signOut()
+      setStatus("Account confirmed. Redirecting to sign in...")
+      setTimeout(() => navigate("/login"), 1500)
     }
 
-    completeOAuthSignIn()
+    completeRegistration()
   }, [navigate])
 
   return (

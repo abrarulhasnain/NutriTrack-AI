@@ -1,9 +1,9 @@
-from sqlalchemy.orm import Session
+﻿from sqlalchemy.orm import Session
+from sqlalchemy.exc import IntegrityError
 from app.users.models import User
 
 
 class UserRepository:
-
     def __init__(self, db: Session):
         self.db = db
 
@@ -18,13 +18,11 @@ class UserRepository:
         ).first()
 
     def create(self, supabase_user_id: str, email: str, full_name: str = None):
-        # Pehle check karo agar already exist karta hai
         existing = self.db.query(User).filter(
             User.supabase_user_id == supabase_user_id
         ).first()
-
         if existing:
-            return existing  # Already hai toh wahi return karo
+            return existing
 
         user = User(
             supabase_user_id=supabase_user_id,
@@ -32,7 +30,18 @@ class UserRepository:
             full_name=full_name
         )
         self.db.add(user)
-        self.db.commit()
+
+        try:
+            self.db.commit()
+        except IntegrityError:
+            # Another concurrent request (e.g. React StrictMode firing
+            # the registration call twice) already created this user.
+            # Roll back and return the row that now exists instead of crashing.
+            self.db.rollback()
+            return self.db.query(User).filter(
+                User.supabase_user_id == supabase_user_id
+            ).first()
+
         self.db.refresh(user)
         return user
 
