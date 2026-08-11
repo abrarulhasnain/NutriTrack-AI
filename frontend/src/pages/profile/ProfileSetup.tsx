@@ -20,6 +20,32 @@ const FITNESS_GOAL_OPTIONS = [
   'Build Muscle',
 ]
 
+function calculateBMI(heightCm: string, weightKg: string) {
+  const h = Number(heightCm) / 100
+  const w = Number(weightKg)
+  if (!h || !w) return null
+
+  const bmi = w / (h * h)
+  let category = ''
+  let color = ''
+
+  if (bmi < 18.5) {
+    category = 'Underweight'
+    color = 'text-blue-500'
+  } else if (bmi < 25) {
+    category = 'Normal'
+    color = 'text-green-500'
+  } else if (bmi < 30) {
+    category = 'Overweight'
+    color = 'text-orange-500'
+  } else {
+    category = 'Obese'
+    color = 'text-red-500'
+  }
+
+  return { value: bmi.toFixed(1), category, color }
+}
+
 export default function ProfileSetup() {
   const navigate = useNavigate()
 
@@ -110,6 +136,7 @@ export default function ProfileSetup() {
 
   const inputClass = "w-full rounded-full border border-gray-200 px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400 transition"
   const selectClass = `${inputClass} bg-white appearance-none`
+  const bmi = calculateBMI(formData.height_cm, formData.weight_kg)
 
   if (pageLoading) {
     return <p className="text-center mt-10 text-gray-400">Loading...</p>
@@ -145,6 +172,13 @@ export default function ProfileSetup() {
 
           <input name="height_cm" type="number" placeholder="Height (cm)" value={formData.height_cm} onChange={handleChange} className={inputClass} required />
           <input name="weight_kg" type="number" placeholder="Weight (kg)" value={formData.weight_kg} onChange={handleChange} className={inputClass} required />
+
+          {bmi && (
+            <div className="flex items-center justify-between bg-gray-50 rounded-full px-4 py-2 text-sm">
+              <span className="text-gray-500">Your BMI</span>
+              <span className={`font-bold ${bmi.color}`}>{bmi.value} · {bmi.category}</span>
+            </div>
+          )}
 
           <select name="activity_level" value={formData.activity_level} onChange={handleChange} className={selectClass} required>
             <option value="" disabled>Select Activity Level</option>
