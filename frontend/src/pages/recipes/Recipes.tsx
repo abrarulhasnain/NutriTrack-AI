@@ -5,10 +5,26 @@ import toast from 'react-hot-toast'
 import api from '@/api/axiosInstance'
 import FoodSearchInput from '@/components/shared/FoodSearchInput'
 
+interface Food {
+  id: string
+  name: string
+  serving_size: number
+  serving_unit: string
+  calories: number
+  protein: number
+  carbs: number
+  fat: number
+}
+
 interface RecipeItem {
   food_id: string
   food_name: string
-  quantity: number
+  serving_size: number
+  calories: number
+  protein: number
+  carbs: number
+  fat: number
+  quantity: string
   unit: string
 }
 
@@ -23,12 +39,18 @@ interface Recipe {
   total_fat: number
 }
 
+const emptyItem: RecipeItem = {
+  food_id: '', food_name: '', serving_size: 0,
+  calories: 0, protein: 0, carbs: 0, fat: 0,
+  quantity: '', unit: 'g',
+}
+
 export default function Recipes() {
   const [recipes, setRecipes] = useState<Recipe[]>([])
   const [name, setName] = useState('')
   const [description, setDescription] = useState('')
   const [servings, setServings] = useState(1)
-  const [items, setItems] = useState<RecipeItem[]>([{ food_id: '', food_name: '', quantity: 0, unit: 'g' }])
+  const [items, setItems] = useState<RecipeItem[]>([{ ...emptyItem }])
   const [loading, setLoading] = useState(false)
   const [fetching, setFetching] = useState(true)
 
@@ -47,25 +69,57 @@ export default function Recipes() {
     fetchRecipes()
   }, [])
 
-  function updateItem(index: number, field: keyof RecipeItem, value: string | number) {
+  function updateQuantity(index: number, value: string) {
     const newItems = [...items]
-    newItems[index] = { ...newItems[index], [field]: value }
+    newItems[index] = { ...newItems[index], quantity: value }
     setItems(newItems)
   }
 
-  function handleFoodSelect(index: number, foodId: string, foodName: string) {
+  function updateUnit(index: number, value: string) {
     const newItems = [...items]
-    newItems[index] = { ...newItems[index], food_id: foodId, food_name: foodName }
+    newItems[index] = { ...newItems[index], unit: value }
+    setItems(newItems)
+  }
+
+  function handleFoodSelect(index: number, food: Food) {
+    const newItems = [...items]
+    newItems[index] = {
+      ...newItems[index],
+      food_id: food.id,
+      food_name: food.name,
+      serving_size: food.serving_size,
+      calories: food.calories,
+      protein: food.protein,
+      carbs: food.carbs,
+      fat: food.fat,
+      unit: food.serving_unit,
+    }
     setItems(newItems)
   }
 
   function addItemRow() {
-    setItems([...items, { food_id: '', food_name: '', quantity: 0, unit: 'g' }])
+    setItems([...items, { ...emptyItem }])
   }
 
   function removeItemRow(index: number) {
     setItems(items.filter((_, i) => i !== index))
   }
+
+  const estimatedTotals = items.reduce(
+    (acc, item) => {
+      if (!item.food_id || !item.serving_size) return acc
+      const scale = Number(item.quantity || 0) / item.serving_size
+      return {
+        calories: acc.calories + item.calories * scale,
+        protein: acc.protein + item.protein * scale,
+        carbs: acc.carbs + item.carbs * scale,
+        fat: acc.fat + item.fat * scale,
+      }
+    },
+    { calories: 0, protein: 0, carbs: 0, fat: 0 }
+  )
+
+  const hasValidItems = items.some((item) => item.food_id && Number(item.quantity) > 0)
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
@@ -94,7 +148,7 @@ export default function Recipes() {
       setName('')
       setDescription('')
       setServings(1)
-      setItems([{ food_id: '', food_name: '', quantity: 0, unit: 'g' }])
+      setItems([{ ...emptyItem }])
 
       await fetchRecipes()
       toast.success('Recipe created!')
@@ -155,21 +209,21 @@ export default function Recipes() {
                 <div key={index} className="grid grid-cols-[1fr_80px_64px_auto] gap-2 items-center">
                   <FoodSearchInput
                     value={item.food_name}
-                    onSelect={(foodId, foodName) => handleFoodSelect(index, foodId, foodName)}
+                    onSelect={(food) => handleFoodSelect(index, food)}
                     placeholder="Search food (e.g. chicken)"
                   />
                   <input
                     type="number"
                     placeholder="Qty"
                     value={item.quantity}
-                    onChange={(e) => updateItem(index, 'quantity', e.target.value)}
+                    onChange={(e) => updateQuantity(index, e.target.value)}
                     className={inputClass}
                     required
                   />
                   <input
                     placeholder="Unit"
                     value={item.unit}
-                    onChange={(e) => updateItem(index, 'unit', e.target.value)}
+                    onChange={(e) => updateUnit(index, e.target.value)}
                     className={inputClass}
                     required
                   />
@@ -187,6 +241,19 @@ export default function Recipes() {
               + Add Ingredient
             </button>
           </div>
+
+          {hasValidItems && (
+            <motion.div
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: 'auto' }}
+              className="bg-indigo-50 rounded-xl p-3 text-sm"
+            >
+              <p className="text-xs text-indigo-500 font-medium mb-1">Estimated Nutrition</p>
+              <p className="text-gray-700">
+                {Math.round(estimatedTotals.calories)} cal · {Math.round(estimatedTotals.protein)}g protein · {Math.round(estimatedTotals.carbs)}g carbs · {Math.round(estimatedTotals.fat)}g fat
+              </p>
+            </motion.div>
+          )}
 
           <button
             type="submit"
