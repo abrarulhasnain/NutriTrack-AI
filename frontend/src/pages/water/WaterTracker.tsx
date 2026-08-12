@@ -1,12 +1,13 @@
 import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { Droplet } from 'lucide-react'
+import toast from 'react-hot-toast'
 import api from '@/api/axiosInstance'
 
 export default function WaterTracker() {
   const [total, setTotal] = useState<number>(0)
+  const [goal, setGoal] = useState<number>(2500)
   const [loading, setLoading] = useState(false)
-  const [error, setError] = useState('')
 
   const today = new Date().toISOString().split('T')[0]
 
@@ -21,8 +22,16 @@ export default function WaterTracker() {
     }
   }
 
+  async function fetchGoal() {
+    try {
+      const response = await api.get('/profiles/')
+      setGoal(response.data.data.water_goal)
+    } catch (err) {
+      console.error(err)
+    }
+  }
+
   async function addWater(amount: number) {
-    setError('')
     setLoading(true)
 
     try {
@@ -31,8 +40,9 @@ export default function WaterTracker() {
         amount_ml: amount,
       })
       await fetchTotal()
+      toast.success(`Added ${amount}ml!`)
     } catch (err) {
-      setError('Failed to log water. Please try again.')
+      toast.error('Failed to log water. Please try again.')
       console.error(err)
     } finally {
       setLoading(false)
@@ -41,7 +51,13 @@ export default function WaterTracker() {
 
   useEffect(() => {
     fetchTotal()
+    fetchGoal()
   }, [])
+
+  const percentage = Math.min((total / goal) * 100, 100)
+  const radius = 80
+  const circumference = 2 * Math.PI * radius
+  const strokeDashoffset = circumference - (percentage / 100) * circumference
 
   return (
     <div className="min-h-[80vh] flex items-center justify-center px-4">
@@ -58,15 +74,51 @@ export default function WaterTracker() {
         <h1 className="text-xl font-bold text-gray-800 mb-1">Water Tracker</h1>
         <p className="text-sm text-gray-400 mb-6">Today's total intake</p>
 
-        <motion.p
-          key={total}
-          initial={{ scale: 0.8, opacity: 0 }}
-          animate={{ scale: 1, opacity: 1 }}
-          transition={{ duration: 0.3 }}
-          className="text-5xl font-extrabold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent mb-8"
-        >
-          {total} ml
-        </motion.p>
+        <div className="relative w-52 h-52 mx-auto mb-8">
+          <svg className="w-full h-full -rotate-90" viewBox="0 0 180 180">
+            <circle
+              cx="90"
+              cy="90"
+              r={radius}
+              fill="none"
+              stroke="#e5e7eb"
+              strokeWidth="12"
+            />
+            <motion.circle
+              cx="90"
+              cy="90"
+              r={radius}
+              fill="none"
+              stroke="url(#gradient)"
+              strokeWidth="12"
+              strokeLinecap="round"
+              strokeDasharray={circumference}
+              initial={{ strokeDashoffset: circumference }}
+              animate={{ strokeDashoffset }}
+              transition={{ duration: 0.6, ease: 'easeOut' }}
+            />
+            <defs>
+              <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stopColor="#6366f1" />
+                <stop offset="100%" stopColor="#a855f7" />
+              </linearGradient>
+            </defs>
+          </svg>
+
+          <div className="absolute inset-0 flex flex-col items-center justify-center">
+            <motion.p
+              key={total}
+              initial={{ scale: 0.8, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              transition={{ duration: 0.3 }}
+              className="text-3xl font-extrabold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent"
+            >
+              {total}
+            </motion.p>
+            <p className="text-xs text-gray-400 mt-1">of {goal} ml</p>
+            <p className="text-xs font-medium text-indigo-500 mt-1">{Math.round(percentage)}%</p>
+          </div>
+        </div>
 
         <div className="flex gap-3 justify-center">
           <button
@@ -84,8 +136,6 @@ export default function WaterTracker() {
             +500 ml
           </button>
         </div>
-
-        {error && <p className="text-red-500 text-sm mt-4">{error}</p>}
       </motion.div>
     </div>
   )

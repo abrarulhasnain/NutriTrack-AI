@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Apple, Trash2 } from 'lucide-react'
+import toast from 'react-hot-toast'
 import api from '@/api/axiosInstance'
 
 interface CustomFood {
@@ -22,7 +23,6 @@ export default function CustomFoods() {
     name: '', serving_size: '', serving_unit: '', calories: '',
     protein: '', carbs: '', fat: '', fiber: '', sugar: '',
   })
-  const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
   const [fetching, setFetching] = useState(true)
 
@@ -47,7 +47,6 @@ export default function CustomFoods() {
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
-    setError('')
     setLoading(true)
 
     try {
@@ -69,19 +68,25 @@ export default function CustomFoods() {
       })
 
       await fetchFoods()
+      toast.success('Custom food added!')
     } catch (err) {
-      setError('Failed to create custom food. Please try again.')
+      toast.error('Failed to create custom food. Please try again.')
       console.error(err)
     } finally {
       setLoading(false)
     }
   }
 
-  async function handleDelete(id: string) {
+  async function handleDelete(id: string, name: string) {
+    const confirmed = window.confirm(`Delete "${name}"? This cannot be undone.`)
+    if (!confirmed) return
+
     try {
       await api.delete(`/custom-foods/${id}`)
       await fetchFoods()
+      toast.success('Custom food deleted.')
     } catch (err) {
+      toast.error('Failed to delete. Please try again.')
       console.error(err)
     }
   }
@@ -126,8 +131,6 @@ export default function CustomFoods() {
             <input name="sugar" type="number" placeholder="Sugar" value={formData.sugar} onChange={handleChange} className={inputClass} required />
           </div>
 
-          {error && <p className="text-red-500 text-sm">{error}</p>}
-
           <button
             type="submit"
             disabled={loading}
@@ -163,7 +166,7 @@ export default function CustomFoods() {
                   {food.calories} cal | {food.protein}g protein | {food.carbs}g carbs | {food.fat}g fat
                 </p>
               </div>
-              <button onClick={() => handleDelete(food.id)} className="text-gray-400 hover:text-red-500 transition p-1">
+              <button onClick={() => handleDelete(food.id, food.name)} className="text-gray-400 hover:text-red-500 transition p-1">
                 <Trash2 size={18} />
               </button>
             </motion.div>

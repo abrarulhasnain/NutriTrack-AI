@@ -6,11 +6,15 @@ interface Food {
   name: string
   serving_size: number
   serving_unit: string
+  calories: number
+  protein: number
+  carbs: number
+  fat: number
 }
 
 interface Props {
   value: string
-  onSelect: (foodId: string, foodName: string) => void
+  onSelect: (food: Food) => void
   placeholder?: string
 }
 
@@ -49,7 +53,7 @@ export default function FoodSearchInput({ value, onSelect, placeholder }: Props)
     setQuery(food.name)
     setShowDropdown(false)
     setResults([])
-    onSelect(food.id, food.name)
+    onSelect(food)
   }
 
   return (
@@ -70,6 +74,7 @@ export default function FoodSearchInput({ value, onSelect, placeholder }: Props)
             <button
               key={food.id}
               type="button"
+              onMouseDown={(e) => e.preventDefault()}
               onClick={() => handleSelect(food)}
               className="w-full text-left px-4 py-2 hover:bg-indigo-50 text-sm transition"
             >

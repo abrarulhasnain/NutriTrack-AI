@@ -2,6 +2,7 @@
 import { useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { UserCircle } from 'lucide-react'
+import toast from 'react-hot-toast'
 import api from '@/api/axiosInstance'
 
 const GENDER_OPTIONS = ['Male', 'Female', 'Other', 'Prefer not to say']
@@ -28,6 +29,32 @@ function Field({ label, children }: { label: string; children: React.ReactNode }
   )
 }
 
+function calculateBMI(heightCm: string, weightKg: string) {
+  const h = Number(heightCm) / 100
+  const w = Number(weightKg)
+  if (!h || !w) return null
+
+  const bmi = w / (h * h)
+  let category = ''
+  let color = ''
+
+  if (bmi < 18.5) {
+    category = 'Underweight'
+    color = 'text-blue-500'
+  } else if (bmi < 25) {
+    category = 'Normal'
+    color = 'text-green-500'
+  } else if (bmi < 30) {
+    category = 'Overweight'
+    color = 'text-orange-500'
+  } else {
+    category = 'Obese'
+    color = 'text-red-500'
+  }
+
+  return { value: bmi.toFixed(1), category, color }
+}
+
 export default function ProfileSetup() {
   const navigate = useNavigate()
 
@@ -46,7 +73,6 @@ export default function ProfileSetup() {
     water_goal: '',
   })
   const [isEditing, setIsEditing] = useState(false)
-  const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
   const [pageLoading, setPageLoading] = useState(true)
 
@@ -87,7 +113,6 @@ export default function ProfileSetup() {
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
-    setError('')
     setLoading(true)
 
     const payload = {
@@ -108,9 +133,10 @@ export default function ProfileSetup() {
       } else {
         await api.post('/profiles/', payload)
       }
+      toast.success(isEditing ? 'Profile updated!' : 'Profile saved!')
       navigate('/dashboard')
     } catch (err) {
-      setError('Something went wrong while saving your profile. Please try again.')
+      toast.error('Something went wrong while saving your profile. Please try again.')
       console.error(err)
     } finally {
       setLoading(false)
@@ -119,6 +145,7 @@ export default function ProfileSetup() {
 
   const inputClass = "w-full rounded-full border border-gray-200 px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400 transition"
   const selectClass = `${inputClass} bg-white appearance-none`
+  const bmi = calculateBMI(formData.height_cm, formData.weight_kg)
 
   if (pageLoading) {
     return <p className="text-center mt-10 text-gray-400">Loading...</p>
@@ -167,6 +194,13 @@ export default function ProfileSetup() {
             <input name="weight_kg" type="number" placeholder="e.g. 70" value={formData.weight_kg} onChange={handleChange} className={inputClass} required />
           </Field>
 
+          {bmi && (
+            <div className="flex items-center justify-between bg-gray-50 rounded-full px-4 py-2 text-sm">
+              <span className="text-gray-500">Your BMI</span>
+              <span className={`font-bold ${bmi.color}`}>{bmi.value} · {bmi.category}</span>
+            </div>
+          )}
+
           <Field label="Activity Level">
             <select name="activity_level" value={formData.activity_level} onChange={handleChange} className={selectClass} required>
               <option value="" disabled>Select Activity Level</option>
@@ -204,8 +238,6 @@ export default function ProfileSetup() {
           <Field label="Water (ml)">
             <input name="water_goal" type="number" placeholder="e.g. 2500" value={formData.water_goal} onChange={handleChange} className={inputClass} required />
           </Field>
-
-          {error && <p className="text-red-500 text-sm">{error}</p>}
 
           <button
             type="submit"

@@ -1,4 +1,5 @@
 ﻿import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
+import { Toaster } from 'react-hot-toast'
 import { AuthProvider } from './context/AuthProvider'
 import { ProtectedRoute } from './context/ProtectedRoute'
 import { AuthPage } from './pages/auth/AuthPage'
@@ -18,6 +19,7 @@ import Reports from './pages/reports/Reports'
 function App() {
   return (
     <AuthProvider>
+      <Toaster position="top-center" toastOptions={{ duration: 3000 }} />
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Navigate to="/dashboard" replace />} />
