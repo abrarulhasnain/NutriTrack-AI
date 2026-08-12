@@ -1,4 +1,4 @@
-from uuid import UUID
+﻿from uuid import UUID
 from pydantic import BaseModel
 from typing import Optional
 from datetime import date
@@ -24,6 +24,7 @@ class MatchedItem(BaseModel):
     quantity: float
     unit: str
     food_id: Optional[UUID] = None
+    custom_food_id: Optional[UUID] = None
     matched_food_name: Optional[str] = None
     confidence: float
     matched: bool          # True = confident match found, False = needs manual selection

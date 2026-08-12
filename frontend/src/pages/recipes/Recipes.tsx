@@ -1,6 +1,6 @@
-import { useState, useEffect } from 'react'
+﻿import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { ChefHat, Trash2, X } from 'lucide-react'
+import { ChefHat, Trash2, X, UtensilsCrossed } from 'lucide-react'
 import toast from 'react-hot-toast'
 import api from '@/api/axiosInstance'
 import FoodSearchInput from '@/components/shared/FoodSearchInput'
@@ -28,6 +28,14 @@ interface RecipeItem {
   unit: string
 }
 
+interface SavedRecipeItem {
+  id: string
+  food_id: string | null
+  custom_food_id: string | null
+  quantity: number
+  unit: string
+}
+
 interface Recipe {
   id: string
   name: string
@@ -37,6 +45,7 @@ interface Recipe {
   total_protein: number
   total_carbs: number
   total_fat: number
+  items: SavedRecipeItem[]
 }
 
 const emptyItem: RecipeItem = {
@@ -44,6 +53,8 @@ const emptyItem: RecipeItem = {
   calories: 0, protein: 0, carbs: 0, fat: 0,
   quantity: '', unit: 'g',
 }
+
+const mealTypes = ['breakfast', 'lunch', 'dinner', 'snack']
 
 export default function Recipes() {
   const [recipes, setRecipes] = useState<Recipe[]>([])
@@ -53,6 +64,9 @@ export default function Recipes() {
   const [items, setItems] = useState<RecipeItem[]>([{ ...emptyItem }])
   const [loading, setLoading] = useState(false)
   const [fetching, setFetching] = useState(true)
+  const [loggingRecipeId, setLoggingRecipeId] = useState<string | null>(null)
+  const [loggingMealType, setLoggingMealType] = useState('breakfast')
+  const [submittingLog, setSubmittingLog] = useState(false)
 
   async function fetchRecipes() {
     try {
@@ -174,10 +188,36 @@ export default function Recipes() {
     }
   }
 
+  async function handleLogAsMeal(recipe: Recipe) {
+    setSubmittingLog(true)
+    const today = new Date().toISOString().split('T')[0]
+
+    try {
+      await api.post('/meals/', {
+        meal_date: today,
+        meal_type: loggingMealType,
+        original_text: recipe.name,
+        items: recipe.items.map((item) => ({
+          food_id: item.food_id,
+          custom_food_id: item.custom_food_id,
+          quantity: item.quantity,
+          unit: item.unit,
+        })),
+      })
+      toast.success(`Logged "${recipe.name}" as ${loggingMealType}.`)
+      setLoggingRecipeId(null)
+    } catch (err) {
+      toast.error('Failed to log this recipe as a meal. Please try again.')
+      console.error(err)
+    } finally {
+      setSubmittingLog(false)
+    }
+  }
+
   const inputClass = "w-full rounded-full border border-gray-200 px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400 transition"
 
   return (
-    <div className="max-w-2xl mx-auto mt-10 px-4 space-y-8">
+    <div className="max-w-2xl mx-auto mt-10 px-4 space-y-8 pb-10">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -265,7 +305,7 @@ export default function Recipes() {
         </form>
       </motion.div>
 
-      <div className="space-y-3 pb-10">
+      <div className="space-y-3">
         <h2 className="text-lg font-semibold text-gray-800">Saved Recipes</h2>
 
         {fetching && <p className="text-gray-400 text-sm">Loading...</p>}
@@ -281,19 +321,66 @@ export default function Recipes() {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, x: -20 }}
               transition={{ duration: 0.3, delay: index * 0.05 }}
-              className="bg-white rounded-2xl shadow-md p-4 flex justify-between items-start"
+              className="bg-white rounded-2xl shadow-md p-4"
             >
-              <div>
-                <h3 className="font-bold text-gray-800">{recipe.name}</h3>
-                <p className="text-sm text-gray-500">{recipe.description}</p>
-                <p className="text-sm mt-1 text-gray-600">
-                  {recipe.total_calories} cal | {recipe.total_protein}g protein | {recipe.total_carbs}g carbs | {recipe.total_fat}g fat
-                </p>
-                <p className="text-xs text-gray-400">Servings: {recipe.servings}</p>
+              <div className="flex justify-between items-start">
+                <div>
+                  <h3 className="font-bold text-gray-800">{recipe.name}</h3>
+                  <p className="text-sm text-gray-500">{recipe.description}</p>
+                  <p className="text-sm mt-1 text-gray-600">
+                    {recipe.total_calories} cal | {recipe.total_protein}g protein | {recipe.total_carbs}g carbs | {recipe.total_fat}g fat
+                  </p>
+                  <p className="text-xs text-gray-400">Servings: {recipe.servings}</p>
+                </div>
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={() => {
+                      setLoggingRecipeId(recipe.id)
+                      setLoggingMealType('breakfast')
+                    }}
+                    className="text-indigo-500 hover:text-indigo-700 transition p-1"
+                    title="Log as meal"
+                  >
+                    <UtensilsCrossed size={18} />
+                  </button>
+                  <button onClick={() => handleDelete(recipe.id, recipe.name)} className="text-gray-400 hover:text-red-500 transition p-1">
+                    <Trash2 size={18} />
+                  </button>
+                </div>
               </div>
-              <button onClick={() => handleDelete(recipe.id, recipe.name)} className="text-gray-400 hover:text-red-500 transition p-1">
-                <Trash2 size={18} />
-              </button>
+
+              {loggingRecipeId === recipe.id && (
+                <motion.div
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: 'auto' }}
+                  className="mt-3 pt-3 border-t border-gray-100 flex items-center gap-2"
+                >
+                  <select
+                    value={loggingMealType}
+                    onChange={(e) => setLoggingMealType(e.target.value)}
+                    className="text-sm px-3 py-2 rounded-full bg-gray-100 outline-none focus:ring-2 focus:ring-indigo-400"
+                  >
+                    {mealTypes.map((type) => (
+                      <option key={type} value={type}>
+                        {type.charAt(0).toUpperCase() + type.slice(1)}
+                      </option>
+                    ))}
+                  </select>
+                  <button
+                    onClick={() => handleLogAsMeal(recipe)}
+                    disabled={submittingLog}
+                    className="flex-1 text-sm rounded-full bg-indigo-500 hover:bg-indigo-600 text-white font-medium py-2 transition disabled:opacity-50"
+                  >
+                    {submittingLog ? 'Logging...' : 'Confirm'}
+                  </button>
+                  <button
+                    onClick={() => setLoggingRecipeId(null)}
+                    className="text-gray-400 hover:text-gray-600 p-2"
+                  >
+                    <X size={16} />
+                  </button>
+                </motion.div>
+              )}
             </motion.div>
           ))}
         </AnimatePresence>

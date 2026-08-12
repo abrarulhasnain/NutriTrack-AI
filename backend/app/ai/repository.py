@@ -1,8 +1,9 @@
-import re
+﻿import re
 from difflib import SequenceMatcher
+from uuid import UUID
 from sqlalchemy.orm import Session
-
 from app.nutrition.models import Food
+from app.custom_foods.models import CustomFood
 
 
 def tokenize(name: str) -> set[str]:
@@ -27,36 +28,44 @@ def calculate_similarity(name_a: str, name_b: str) -> float:
     """
     words_a = tokenize(name_a)
     words_b = tokenize(name_b)
-
     if not words_a or not words_b:
         return 0.0
-
     common_words = words_a & words_b
     word_overlap_score = len(common_words) / min(len(words_a), len(words_b))
-
     char_score = SequenceMatcher(
         None, " ".join(sorted(words_a)), " ".join(sorted(words_b))
     ).ratio()
-
     return round((0.7 * word_overlap_score) + (0.3 * char_score), 4)
 
 
-def find_best_matching_food(db: Session, extracted_name: str) -> tuple[Food | None, float]:
+def find_best_matching_food(db: Session, extracted_name: str, user_id: UUID):
     """
-    Searches all foods in the database and returns the closest match
-    for the given extracted food name, along with a confidence score.
+    Searches both the shared reference foods table and the user's own
+    custom foods, and returns the closest match for the given extracted
+    food name, along with a confidence score and which table it came from.
 
-    Returns (None, 0.0) if the foods table is empty.
+    Returns (food_object, score, "food" | "custom_food") or (None, 0.0, None)
+    if nothing is found.
     """
     all_foods = db.query(Food).all()
+    all_custom_foods = db.query(CustomFood).filter(CustomFood.user_id == user_id).all()
 
-    best_food = None
+    best_match = None
     best_score = 0.0
+    best_source = None
 
     for food in all_foods:
         score = calculate_similarity(extracted_name, food.name)
         if score > best_score:
             best_score = score
-            best_food = food
+            best_match = food
+            best_source = "food"
 
-    return best_food, best_score
+    for custom_food in all_custom_foods:
+        score = calculate_similarity(extracted_name, custom_food.name)
+        if score > best_score:
+            best_score = score
+            best_match = custom_food
+            best_source = "custom_food"
+
+    return best_match, best_score, best_source
