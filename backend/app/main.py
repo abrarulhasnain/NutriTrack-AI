@@ -23,7 +23,10 @@ logger.info("Starting NutriTrack application")
 app = FastAPI(title=settings.app_name)
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173"],
+    allow_origins=[
+        "http://localhost:5173",
+        "https://nutritrack-ai-frontend-production.up.railway.app",
+    ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
