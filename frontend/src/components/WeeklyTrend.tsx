@@ -1,4 +1,4 @@
-﻿import { useEffect, useState } from "react"
+import { useEffect, useState } from "react"
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer } from "recharts"
 import api from "@/api/axiosInstance"
 
@@ -40,7 +40,7 @@ export function WeeklyTrend() {
           <YAxis tick={{ fontSize: 12, fill: "#9ca3af" }} axisLine={false} tickLine={false} />
           <Tooltip
             contentStyle={{ borderRadius: 8, border: "1px solid #e5e7eb", fontSize: 12 }}
-            formatter={(value: number) => [`${value} kcal`, "Calories"]}
+            formatter={(value) => [`${value ?? 0} kcal`, "Calories"]}
           />
           <Line
             type="monotone"
@@ -54,3 +54,4 @@ export function WeeklyTrend() {
     </div>
   )
 }
+

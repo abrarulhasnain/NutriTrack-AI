@@ -1,4 +1,4 @@
-﻿import { useEffect, useState } from "react"
+import { useEffect, useState } from "react"
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from "recharts"
 import api from "@/api/axiosInstance"
 
@@ -40,7 +40,7 @@ export function WaterWeeklyTrend() {
           <YAxis tick={{ fontSize: 12, fill: "#9ca3af" }} axisLine={false} tickLine={false} />
           <Tooltip
             contentStyle={{ borderRadius: 8, border: "1px solid #e5e7eb", fontSize: 12 }}
-            formatter={(value: number) => [`${value} ml`, "Water"]}
+            formatter={(value) => [`${value ?? 0} ml`, "Water"]}
           />
           <Bar dataKey="water" fill="#0ea5e9" radius={[6, 6, 0, 0]} />
         </BarChart>
@@ -48,3 +48,4 @@ export function WaterWeeklyTrend() {
     </div>
   )
 }
+
