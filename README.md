@@ -87,12 +87,6 @@ NutriTrack-AI/
         └── context/        # Auth context
 ```
 
-## Module Ownership
-
-| Module | Owner |
-|---|---|
-| Auth, AI meal logging, meal history, dashboard | Abrar |
-| Profile setup, water tracking, recipes, custom foods, reports | Manahil |
 
 ## Getting Started
 
