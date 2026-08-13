@@ -1,6 +1,4 @@
-Theek hai, README.md ke liye ready-to-paste content — yeh text copy karke apni `README.md` file mein daal do:
 
-```markdown
 # NutriTrack AI 🥗
 
 A full-stack nutrition tracking web application with AI-powered meal logging, nutrition analytics, and personalized goal tracking. Built as a team project to help users log meals effortlessly and stay on top of their daily nutrition goals.
