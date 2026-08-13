@@ -8,7 +8,7 @@ A full-stack nutrition tracking platform with AI-powered meal logging. Users des
 
 | Feature | Capability |
 |---|---|
-| AI Meal Logging | Describe a meal in plain text (English, Urdu, or Roman Urdu) → AI identifies items → matched against food database → meal auto-logged |
+| AI Meal Logging | Describe a meal in plain text, in any language → AI identifies and translates items → matched against food database → meal auto-logged |
 | AI Goal Suggestions | Enter age, height, weight, activity level, and fitness goal → calorie/macro targets auto-calculated via Mifflin-St Jeor formula |
 | AI Meal Suggestions | Dashboard suggests a meal or snack based on your remaining calories and macros for the day |
 | Custom Foods & Recipes | Add your own foods and recipes, then log them directly as meals |
