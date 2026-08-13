@@ -1,155 +1,224 @@
 
 # NutriTrack AI 🥗
-
-A full-stack nutrition tracking web application with AI-powered meal logging, nutrition analytics, and personalized goal tracking. Built as a team project to help users log meals effortlessly and stay on top of their daily nutrition goals.
+A full-stack nutrition tracking platform with AI-powered meal logging. Users describe what they ate in plain text (even Roman Urdu), and AI identifies the food items, matches them against a nutrition database, and logs the meal automatically — while all calorie and macro calculations come from verified data, not the AI.
 
 **Live App:** https://nutritrack-ai-frontend-production.up.railway.app
 
-## Features
+## 📸 Overview
 
-- **AI-Powered Meal Logging** — Describe what you ate in plain text, including Roman Urdu, Urdu, or household measures (e.g. "1 bowl daal, 2 rotis"). The AI identifies individual food items, converts household measures to grams, and adds descriptive qualifiers for ambiguous names (e.g. "rice" → "white rice"). If every item matches with high confidence, the meal is logged automatically — no manual entry needed.
+| Feature | Capability |
+|---|---|
+| AI Meal Logging | Describe a meal in plain text (English, Urdu, or Roman Urdu) → AI identifies items → matched against food database → meal auto-logged |
+| AI Goal Suggestions | Enter age, height, weight, activity level, and fitness goal → calorie/macro targets auto-calculated via Mifflin-St Jeor formula |
+| AI Meal Suggestions | Dashboard suggests a meal or snack based on your remaining calories and macros for the day |
+| Custom Foods & Recipes | Add your own foods and recipes, then log them directly as meals |
+| Water Tracking | Log daily water intake and track hydration goals |
+| Reports | View nutrition breakdowns and trends over any date range |
 
-- **Smart Food Matching** — Matches identified food names against a curated database of 300+ foods (USDA + South Asian/Pakistani dishes) as well as your own custom foods, using word-overlap and character-similarity matching tuned for short queries. Auto-logging only triggers when both the name and unit match with high confidence, so incorrect matches never get logged silently.
-
-- **AI-Suggested Daily Goals** — During onboarding, your calorie and macro targets are automatically calculated from your age, height, weight, activity level, and fitness goal using the Mifflin-St Jeor formula — no manual math required, though you can always adjust them yourself.
-
-- **AI Meal Suggestions** — The dashboard shows a personalized meal or snack suggestion generated from your remaining calories and macros for the day, helping you close out your targets without guesswork.
-
-- **Dashboard & Analytics** — Daily calorie/macro rings, weekly trend charts, and the AI meal suggestion card, all in one view.
-
-- **Water Tracking** — Log water intake and track daily hydration goals.
-
-- **Custom Foods & Recipes** — Add your own foods and recipes, then log them directly as meals.
-
-- **Reports** — View nutrition breakdowns and trends over any date range.
-
-- **Secure Authentication** — Email/password and Google OAuth sign-in via Supabase, with email confirmation and password reset flows.
-
-> **Note:** The AI is used strictly for identifying and interpreting food items — it never calculates nutrition values itself. All calorie/macro numbers come from the verified food database.
-
-## Tech Stack
+## 🪄 Tech Stack
 
 **Backend**
-- FastAPI (Python)
-- SQLAlchemy + PostgreSQL (via Supabase)
-- Pydantic / pydantic-settings
-- Groq API (AI meal identification)
-- USDA FoodData Central API (food database seeding)
+
+| Tool | Purpose |
+|---|---|
+| FastAPI | REST API framework |
+| SQLAlchemy | ORM for PostgreSQL |
+| Supabase | PostgreSQL database + Auth |
+| Groq API | AI-powered food identification |
+| USDA FoodData Central | Reference food database seeding |
+| Pydantic / pydantic-settings | Request validation & config |
 
 **Frontend**
-- React + TypeScript + Vite
-- Tailwind CSS + shadcn/ui
-- Framer Motion (animations)
-- Supabase JS client (auth)
 
-**Infrastructure**
-- Supabase (authentication + PostgreSQL hosting)
-- Railway (backend + frontend deployment)
+| Tool | Purpose |
+|---|---|
+| React + Vite | UI framework + dev server |
+| TypeScript | Type safety |
+| Tailwind CSS + shadcn/ui | Styling & components |
+| Framer Motion | Animations |
+| Axios | API client |
+| Supabase JS | Authentication |
 
-## Architecture
-
-The backend follows a consistent layered structure for every module:
-
-```
-models → schemas → repository → service → router
-```
-
-- **models** — SQLAlchemy database models
-- **schemas** — Pydantic request/response schemas
-- **repository** — raw database queries
-- **service** — business logic
-- **router** — FastAPI route handlers
-
-All database access goes through `Depends(get_db)`, and all API responses use standardized `success_response()` / `error_response()` helpers.
-
-## Project Structure
+## 📁 Project Structure
 
 ```
 NutriTrack-AI/
 ├── backend/
 │   └── app/
-│       ├── auth/          # Authentication & token verification
-│       ├── users/         # User registration & profile linkage
-│       ├── profiles/      # Profile setup & goal suggestions
-│       ├── meals/         # Meal logging & history
-│       ├── ai/            # AI-powered meal extraction
-│       ├── nutrition/     # Food database & search
-│       ├── custom_foods/  # User-created foods
-│       ├── recipes/       # Recipe creation & meal logging
-│       ├── water/         # Water intake tracking
-│       ├── dashboard/     # Daily summary aggregation
-│       └── reports/       # Date-range nutrition reports
+│       ├── auth/            # Token verification, current-user dependency
+│       ├── users/           # User registration & Supabase ID linkage
+│       ├── profiles/        # Profile setup + AI goal suggestions
+│       ├── meals/           # Meal logging & history
+│       ├── ai/               # AI-powered meal extraction (Groq)
+│       ├── nutrition/       # Food database & search
+│       ├── custom_foods/    # User-created foods
+│       ├── recipes/         # Recipe creation & meal logging
+│       ├── water/           # Water intake tracking
+│       ├── dashboard/       # Daily summary aggregation
+│       └── reports/         # Date-range nutrition reports
+│
 └── frontend/
     └── src/
-        ├── pages/          # Route-level page components
-        ├── components/     # Shared UI components (Navbar, etc.)
-        ├── api/            # Axios instance & Supabase client
-        └── context/        # Auth context
+        ├── pages/           # Route-level page components
+        ├── components/      # Shared UI components (Navbar, etc.)
+        ├── api/             # Axios instance & Supabase client
+        └── context/         # Auth context
 ```
 
+## ⚙️ Prerequisites
 
-## Getting Started
+- Python 3.11+ — [python.org](https://python.org)
+- Node.js 18+ — [nodejs.org](https://nodejs.org)
+- A Supabase project — [supabase.com](https://supabase.com) (free tier works)
+- A Groq API key — [console.groq.com](https://console.groq.com)
 
-### Prerequisites
-- Python 3.11+
-- Node.js 18+
-- A Supabase project (for auth + PostgreSQL)
-- A Groq API key (for AI meal parsing)
+## 🚀 Getting Started
 
-### Backend Setup
+### 1. Clone the repository
+```bash
+git clone <your-repo-url>
+cd NutriTrack-AI
+```
 
+### 2. Backend Setup
+
+**2a. Create and activate a virtual environment**
 ```bash
 cd backend
 python -m venv .venv
-.venv\Scripts\activate      # Windows
+
+# Activate (Windows)
+.venv\Scripts\activate
+
+# Activate (Linux / macOS)
+source .venv/bin/activate
+```
+
+**2b. Install Python dependencies**
+```bash
 pip install -r requirements.txt
 ```
 
-Create a `.env` file (UTF-8, no BOM) in `backend/` with:
+**2c. Configure environment variables**
 
+Create a `.env` file inside `backend/` (UTF-8, no BOM):
 ```
 DATABASE_URL=postgresql+psycopg://...
 SUPABASE_URL=https://your-project.supabase.co
-SUPABASE_JWT_SECRET=...
-GROQ_API_KEY=...
+SUPABASE_JWT_SECRET=your-jwt-secret
+GROQ_API_KEY=your-groq-api-key
 ```
 
-Run the server:
+> ⚠️ All environment variables must be declared as fields in the `Settings` class in `app/core/config.py` — `os.getenv()` will return `None` even if the value exists in `.env` if it isn't declared there.
 
+**2d. Run the backend server**
 ```bash
 uvicorn app.main:app --reload
 ```
+The API will be available at: `http://127.0.0.1:8000`
+Interactive docs (Swagger UI): `http://127.0.0.1:8000/docs`
 
-Backend runs at `http://127.0.0.1:8000`.
-
-### Frontend Setup
+### 3. Frontend Setup
 
 ```bash
 cd frontend
 npm install
 ```
 
-Create a `.env` file in `frontend/` with:
-
+Create a `.env` file inside `frontend/`:
 ```
 VITE_SUPABASE_URL=https://your-project.supabase.co
-VITE_SUPABASE_ANON_KEY=...
+VITE_SUPABASE_ANON_KEY=your-anon-key
 VITE_API_BASE_URL=http://127.0.0.1:8000
 ```
 
-Run the dev server:
+> 💡 Vite embeds `VITE_*` variables at **build time** — any change to `.env` requires a dev server restart (or rebuild in production) to take effect.
 
+Run the dev server:
 ```bash
 npm run dev
 ```
+The app will be available at: `http://localhost:5173`
 
-Frontend runs at `http://localhost:5173`.
+## 🗄️ Database Overview (Supabase)
 
-## Deployment
+| Table | Description |
+|---|---|
+| `users` | Links Supabase Auth accounts to app user records |
+| `user_profiles` | Body metrics, activity level, calorie/macro goals |
+| `foods` | Shared reference database (USDA + South Asian dishes) |
+| `custom_foods` | User-created foods |
+| `meals` | Logged meals and meal items |
+| `recipes` | User-created recipes |
+| `water_logs` | Daily water intake entries |
 
-Both backend and frontend are deployed on Railway, with environment variables configured separately per service. The frontend build embeds `VITE_*` variables at build time, so any changes require a redeploy to take effect.
+## 🔐 Authentication Flow
 
-## License
+- Users sign up via email/password (with email confirmation) or Google OAuth, both through Supabase Auth
+- On first sign-in, `/users/register` links the Supabase account to an internal `users` row
+- All protected endpoints require an `Authorization: Bearer <token>` header, verified via `get_current_user`
+- If a user signs in with a different method than they registered with (e.g. switching from email/password to Google) using the same email, the backend automatically re-links the existing account instead of creating a duplicate or failing
+
+## 🧠 AI Features
+
+NutriTrack AI uses AI strictly to **understand and identify food**, never to calculate nutrition — all calorie/macro numbers always come from the verified food database.
+
+| Feature | How it works |
+|---|---|
+| **AI Meal Logging** | Parses free-text meal descriptions (including Roman Urdu / Urdu), extracts individual food items, converts household measures ("1 bowl", "2 rotis") into grams, and adds descriptive qualifiers for ambiguous names (e.g. "rice" → "white rice") |
+| **Smart Food Matching** | Matches identified items against both the shared `foods` table and the user's own `custom_foods`, using word-overlap + character-similarity scoring tuned for short queries |
+| **Auto Meal Creation** | A meal is only auto-logged when both the food name and unit are matched with high confidence — otherwise it's left for manual review, so nothing gets logged incorrectly |
+| **AI Goal Suggestions** | Calculates suggested daily calorie and macro targets from age, gender, height, weight, activity level, and fitness goal using the Mifflin-St Jeor equation, pre-filling the onboarding goals step |
+| **AI Meal Suggestions** | Generates a single meal or snack suggestion on the dashboard based on the user's remaining calories and macros for the current day |
+
+## 📡 Key API Endpoints
+
+| Method | Endpoint | Description |
+|---|---|---|
+| POST | `/users/register` | Register/link a Supabase user |
+| GET | `/users/me` | Get current user |
+| POST | `/profiles/` | Create profile |
+| POST | `/profiles/suggest-goals` | AI-calculated goal suggestions |
+| POST | `/ai/extract` | AI meal identification + auto-logging |
+| GET | `/ai/suggestion` | AI meal/snack suggestion |
+| GET / POST | `/meals/` | List / log meals |
+| GET | `/dashboard/` | Daily summary (calories, macros, water, meals) |
+| GET | `/reports/` | Nutrition report over a date range |
+| GET / POST | `/water/` | Log / view water intake |
+| GET / POST | `/custom-foods/` | Manage custom foods |
+| GET / POST | `/recipes/` | Manage recipes |
+
+Full interactive documentation: `http://127.0.0.1:8000/docs`
+
+## 🏗️ Building for Production
+
+**Backend** — deploy to any ASGI-compatible host (Railway, Render, Fly.io):
+```bash
+uvicorn app.main:app --host 0.0.0.0 --port $PORT
+```
+
+**Frontend**
+```bash
+cd frontend
+npm run build
+# Output in dist/ — deploy to Railway, Vercel, Netlify, or any static host
+```
+
+## 🛠️ Troubleshooting
+
+| Issue | Fix |
+|---|---|
+| `404` on a valid route after deploy | Check the deployed frontend's `VITE_API_BASE_URL` — Vite env vars are baked in at build time, so a missing/stale value requires a rebuild |
+| `.env` values not loading | Ensure the file is saved as UTF-8 **without BOM** — a BOM prefix silently breaks the first variable |
+| `User registered nahi hai` on a known account | The account's `supabase_user_id` is out of sync (e.g. switched login method) — re-registering via `/users/register` re-links it automatically |
+| Frontend can't reach backend | Confirm `VITE_API_BASE_URL` in `.env` matches your running backend URL |
+
+## 👥 Contributors
+
+- **Abrar** — Auth, AI meal logging, meal history, dashboard
+- **Manahil Waheed** — Profile setup, water tracking, recipes, custom foods, reports
+
+## 📄 License
 
 This project is licensed under the MIT License.
 ```
