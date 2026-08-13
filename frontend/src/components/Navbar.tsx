@@ -30,9 +30,7 @@ export function Navbar() {
 
   const Logo = (
     <div className="flex items-center gap-2">
-      <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-indigo-500 to-purple-500 flex items-center justify-center">
-        <span className="text-white text-sm font-bold">N</span>
-      </div>
+      <img src="/logo-128.png" alt="NutriTrack AI" className="w-8 h-8 rounded-lg" />
       <span className="font-semibold text-gray-700">NutriTrack AI</span>
     </div>
   )
@@ -114,3 +112,4 @@ export function Navbar() {
     </nav>
   )
 }
+
