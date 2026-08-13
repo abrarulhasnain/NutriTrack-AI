@@ -45,6 +45,12 @@ class UserRepository:
         self.db.refresh(user)
         return user
 
+    def update_supabase_id(self, user, new_supabase_id: str):
+        user.supabase_user_id = new_supabase_id
+        self.db.commit()
+        self.db.refresh(user)
+        return user
+
     def delete(self, user_id: str):
         user = self.get_by_id(user_id)
         self.db.delete(user)
@@ -54,3 +60,4 @@ class UserRepository:
         return self.db.query(User).filter(
             User.supabase_user_id == supabase_user_id
         ).first()
+

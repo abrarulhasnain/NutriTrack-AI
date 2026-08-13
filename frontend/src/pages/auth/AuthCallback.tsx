@@ -22,10 +22,12 @@ export function AuthCallback() {
       const email = session.user.email ?? ""
 
       try {
-        await api.post("/users/register", { email, full_name: fullName })
-      } catch {
-        // Already registered - safe to ignore.
-      }
+          await api.post("/users/register", { email, full_name: fullName })
+          } catch (error) {
+            console.error("User registration failed:", error)
+            setStatus("Registration failed. Please try again.")
+            return
+          }
 
       try {
         await api.get("/profiles/")
